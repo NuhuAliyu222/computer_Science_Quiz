@@ -45,7 +45,7 @@ app.post('/api/admin/login', (req, res) => {
   } else {
     res.status(401).json({ 
       success: false, 
-      message: 'Invalid credentials. Use admin / bin_aliyu@121' 
+      message: 'Invalid credentials' 
     });
   }
 });

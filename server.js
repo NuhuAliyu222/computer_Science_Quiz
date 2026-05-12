@@ -501,7 +501,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 CS Quiz Arena Server Running!`);
   console.log(`📍 Local: http://localhost:${PORT}`);
   console.log(`📡 WebSocket: Ready for real-time connections`);
-  console.log(`⏱️  Normal delay after answer: ${DELAY_AFTER_ANSWER}ms`);
+  console.log(`${DELAY_AFTER_ANSWER}ms`);
   console.log(`\n🔐 Admin Login:`);
   console.log(`   Username: ${ADMIN_USERNAME}`);
   console.log(`   Password: ${ADMIN_PASSWORD}`);

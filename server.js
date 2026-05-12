@@ -4,7 +4,6 @@ const socketIo = require('socket.io');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
@@ -22,13 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // ============================================
-// CONFIGURATION & SECURITY
-// ============================================
-const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bin_aliyu@121';
-const NODE_ENV = process.env.NODE_ENV || 'development';
-
-// ============================================
 // DELAY CONFIGURATION - NORMAL SPEED
 // ============================================
 const DELAY_AFTER_ANSWER = 800;      // 0.8 seconds - Normal delay after answering
@@ -36,37 +28,29 @@ const DELAY_TIME_UP = 800;           // 0.8 seconds - Normal delay after time's 
 const DELAY_ALL_ANSWERED = 500;      // 0.5 seconds - Delay when all players answered
 const DELAY_START_GAME = 500;        // 0.5 seconds - Delay before first question
 
-console.log(`\n🔧 [CONFIG] Environment: ${NODE_ENV}`);
-console.log(`⏱️  [CONFIG] Normal delay after answer: ${DELAY_AFTER_ANSWER}ms`);
+// Admin credentials
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'quizmaster2024';
 
-// ============================================
-// ADMIN LOGIN ENDPOINT
-// ============================================
+// Admin login endpoint
 app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
-  console.log(`🔐 [LOGIN] Attempt from ${username}`);
   
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    console.log(`✅ [LOGIN] Success for ${username}`);
     res.json({ 
       success: true, 
       message: 'Login successful', 
       token: 'admin-token-' + Date.now() 
     });
   } else {
-    console.log(`❌ [LOGIN] Failed - invalid credentials`);
     res.status(401).json({ 
       success: false, 
-      message: 'Invalid credentials' 
+      message: 'Invalid credentials. Use admin / quizmaster2024' 
     });
   }
 });
 
-// ============================================
-// QUESTION MANAGEMENT APIS
-// ============================================
-
-// GET all questions
+// Get all questions
 app.get('/api/questions', (req, res) => {
   try {
     const questionsFilePath = path.join(__dirname, 'data', 'questions.json');
@@ -78,12 +62,12 @@ app.get('/api/questions', (req, res) => {
       res.json({ success: true, questions: [] });
     }
   } catch (error) {
-    console.error('❌ [API] Error loading questions:', error);
+    console.error('Error loading questions:', error);
     res.status(500).json({ success: false, message: 'Failed to load questions' });
   }
 });
 
-// POST new question
+// Add new question
 app.post('/api/questions', (req, res) => {
   try {
     const { question, options, answer } = req.body;
@@ -106,15 +90,14 @@ app.post('/api/questions', (req, res) => {
     questions.push(newQuestion);
     fs.writeFileSync(questionsFilePath, JSON.stringify(questions, null, 2));
     
-    console.log(`📚 [API] Question added: ID ${newId}`);
     res.json({ success: true, message: 'Question added', question: newQuestion });
   } catch (error) {
-    console.error('❌ [API] Error adding question:', error);
+    console.error('Error adding question:', error);
     res.status(500).json({ success: false, message: 'Failed to add question' });
   }
 });
 
-// DELETE question
+// Delete question
 app.delete('/api/questions/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -133,23 +116,17 @@ app.delete('/api/questions/:id', (req, res) => {
     }
     
     fs.writeFileSync(questionsFilePath, JSON.stringify(filteredQuestions, null, 2));
-    console.log(`🗑️  [API] Question deleted: ID ${id}`);
     res.json({ success: true, message: 'Question deleted' });
   } catch (error) {
-    console.error('❌ [API] Error deleting question:', error);
+    console.error('Error deleting question:', error);
     res.status(500).json({ success: false, message: 'Failed to delete question' });
   }
 });
-
-// ============================================
-// DATA PERSISTENCE
-// ============================================
 
 // Ensure data directory exists
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
-  console.log('📁 [INIT] Created data directory');
 }
 
 // Questions file path
@@ -190,7 +167,7 @@ if (!fs.existsSync(questionsFilePath)) {
     }
   ];
   fs.writeFileSync(questionsFilePath, JSON.stringify(defaultQuestions, null, 2));
-  console.log('✅ [INIT] Created questions.json with default Computer Science questions');
+  console.log('✅ Created questions.json with default Computer Science questions');
 }
 
 // Helper function to load questions
@@ -199,20 +176,17 @@ function loadQuestions() {
     const data = fs.readFileSync(questionsFilePath, 'utf8');
     return JSON.parse(data);
   } catch (error) {
-    console.error('❌ [DATA] Error loading questions:', error);
+    console.error('Error loading questions:', error);
     return [];
   }
 }
 
-// ============================================
-// GAME STATE MANAGEMENT
-// ============================================
-
+// Game state storage
 const rooms = new Map();
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
-  console.log(`\n👤 [SOCKET] Client connected: ${socket.id}`);
+  console.log(`New client connected: ${socket.id}`);
 
   // Handle joining a room
   socket.on('joinRoom', (data) => {
@@ -235,7 +209,6 @@ io.on('connection', (socket) => {
         timerInterval: null,
         timeRemaining: 20
       });
-      console.log(`🎮 [ROOM] Created new room: ${roomId}`);
     }
 
     const room = rooms.get(roomId);
@@ -259,7 +232,6 @@ io.on('connection', (socket) => {
     
     if (isHost) {
       room.hostId = socket.id;
-      console.log(`👑 [ROOM] ${playerName} is host of ${roomId}`);
     }
 
     socket.join(roomId);
@@ -276,7 +248,7 @@ io.on('connection', (socket) => {
       playersCount: room.players.size
     });
 
-    console.log(`✅ [ROOM] ${playerName} joined ${roomId} (${isHost ? 'Host' : 'Player'})`);
+    console.log(`${playerName} joined room ${roomId} (${isHost ? 'Host' : 'Player'})`);
   });
 
   // Handle starting the game
@@ -316,13 +288,14 @@ io.on('connection', (socket) => {
     }
 
     io.to(roomId).emit('gameStarted');
-    console.log(`🎮 [GAME] Started in ${roomId} with ${room.players.size} players`);
     
     setTimeout(() => {
       if (room.gameActive && room.questions.length > 0) {
         sendQuestionWithTimer(roomId, room);
       }
     }, DELAY_START_GAME);
+
+    console.log(`Game started in room ${roomId} with ${room.players.size} players`);
   });
 
   function sendQuestionWithTimer(roomId, room) {
@@ -331,8 +304,6 @@ io.on('connection', (socket) => {
     const currentQuestion = room.questions[room.currentQuestionIndex];
     room.answeredPlayers.clear();
     room.timeRemaining = 20;
-    
-    console.log(`📝 [GAME] Question ${room.currentQuestionIndex + 1}/${room.questions.length} sent to ${roomId}`);
     
     io.to(roomId).emit('nextQuestion', {
       questionData: currentQuestion,
@@ -358,16 +329,12 @@ io.on('connection', (socket) => {
         clearInterval(room.timerInterval);
         room.timerInterval = null;
         
-        const unansweredCount = room.players.size - room.answeredPlayers.size;
-        console.log(`⏰ [GAME] Time's up for Q${room.currentQuestionIndex + 1}`);
-        
         io.to(roomId).emit('timeUp', { 
           message: `Time's up! Moving to next question...`,
           correctAnswer: room.questions[room.currentQuestionIndex].answer,
           correctAnswerText: room.questions[room.currentQuestionIndex].options[room.questions[room.currentQuestionIndex].answer]
         });
         
-        // NORMAL DELAY after time's up
         setTimeout(() => {
           if (room.gameActive) {
             room.currentQuestionIndex++;
@@ -394,9 +361,8 @@ io.on('connection', (socket) => {
       score: p.score
     })).sort((a, b) => b.score - a.score);
     
-    console.log(`🏆 [GAME] Game ended in ${roomId}`);
-    
     io.to(roomId).emit('gameOver', { scores: finalScores });
+    console.log(`Game ended in room ${roomId}`);
   }
 
   socket.on('submitAnswer', (data) => {
@@ -411,27 +377,24 @@ io.on('connection', (socket) => {
     if (!player) return;
     
     if (room.answeredPlayers.has(socket.id)) {
-      console.log(`⚠️  [GAME] ${playerName} already answered Q${room.currentQuestionIndex + 1}`);
+      socket.emit('errorMessage', 'You already answered this question');
       return;
     }
-    
-    room.answeredPlayers.add(socket.id);
     
     if (isCorrect) {
       player.score += 1;
       room.scores.set(socket.id, player.score);
       socket.emit('scoreUpdate', { score: player.score });
-      console.log(`✅ [GAME] ${playerName} correct! Score: ${player.score}`);
-    } else {
-      console.log(`❌ [GAME] ${playerName} wrong answer`);
     }
     
-    // Send private feedback to the player
+    room.answeredPlayers.add(socket.id);
+    
+    // Send private feedback
     const currentQ = room.questions[room.currentQuestionIndex];
     if (isCorrect) {
       socket.emit('answerFeedback', { 
         correct: true, 
-        message: `✅ Correct! +1 point`,
+        message: '✅ Correct! +1 point',
         yourScore: player.score
       });
     } else {
@@ -442,13 +405,19 @@ io.on('connection', (socket) => {
       });
     }
     
-    // Check if all players answered
+    // Broadcast to others that someone answered (without revealing correctness)
+    io.to(roomId).emit('playerAnswered', {
+      playerName,
+      totalAnswered: room.answeredPlayers.size,
+      totalPlayers: room.players.size
+    });
+    
     if (room.answeredPlayers.size === room.players.size) {
-      console.log(`✅ [GAME] All players answered Q${room.currentQuestionIndex + 1}`);
-      clearInterval(room.timerInterval);
-      room.timerInterval = null;
+      if (room.timerInterval) {
+        clearInterval(room.timerInterval);
+        room.timerInterval = null;
+      }
       
-      // NORMAL DELAY when all players answered
       setTimeout(() => {
         if (room.gameActive) {
           room.currentQuestionIndex++;
@@ -473,8 +442,6 @@ io.on('connection', (socket) => {
         room.players.delete(socket.id);
         socket.leave(roomId);
         
-        console.log(`👋 [ROOM] ${player.name} left ${roomId}`);
-        
         socket.to(roomId).emit('playerLeft', {
           playerName: player.name,
           playersCount: room.players.size
@@ -483,12 +450,10 @@ io.on('connection', (socket) => {
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
           rooms.delete(roomId);
-          console.log(`🗑️  [ROOM] Deleted empty room: ${roomId}`);
         } else if (socket.id === room.hostId && room.players.size > 0) {
           const newHostId = Array.from(room.players.keys())[0];
           room.hostId = newHostId;
           const newHost = room.players.get(newHostId);
-          console.log(`👑 [ROOM] New host: ${newHost.name}`);
           io.to(roomId).emit('newHost', { newHostName: newHost.name });
         }
       }
@@ -498,7 +463,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log(`👤 [SOCKET] Client disconnected: ${socket.id}`);
+    console.log(`Client disconnected: ${socket.id}`);
     
     for (const [roomId, room] of rooms.entries()) {
       if (room.players.has(socket.id)) {
@@ -513,12 +478,10 @@ io.on('connection', (socket) => {
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
           rooms.delete(roomId);
-          console.log(`🗑️  [ROOM] Deleted empty room: ${roomId}`);
         } else if (socket.id === room.hostId) {
           const newHostId = Array.from(room.players.keys())[0];
           room.hostId = newHostId;
           const newHost = room.players.get(newHostId);
-          console.log(`👑 [ROOM] New host: ${newHost.name}`);
           io.to(roomId).emit('newHost', { newHostName: newHost.name });
         }
         break;
@@ -535,21 +498,17 @@ app.get('*', (req, res) => {
 // Start server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(`🚀 Computer Science Quiz Server Running!`);
-  console.log(`${'='.repeat(60)}`);
+  console.log(`\n🚀 CS Quiz Arena Server Running!`);
   console.log(`📍 Local: http://localhost:${PORT}`);
   console.log(`📡 WebSocket: Ready for real-time connections`);
   console.log(`⏱️  Normal delay after answer: ${DELAY_AFTER_ANSWER}ms`);
-  console.log(`📚 Questions file: ${questionsFilePath}`);
   console.log(`\n🔐 Admin Login:`);
   console.log(`   Username: ${ADMIN_USERNAME}`);
-  console.log(`   Password: ${NODE_ENV === 'production' ? '[from environment]' : ADMIN_PASSWORD}`);
+  console.log(`   Password: ${ADMIN_PASSWORD}`);
   console.log(`\n💡 Quick Start:`);
   console.log(`   1. Open http://localhost:${PORT} in your browser`);
   console.log(`   2. Create a room and join`);
   console.log(`   3. Share the room code with friends`);
   console.log(`   4. Click "Admin Panel" to add questions`);
-  console.log(`   5. Host starts the game!`);
-  console.log(`${'='.repeat(60)}\n`);
+  console.log(`   5. Host starts the game!\n`);
 });

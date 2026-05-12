@@ -72,7 +72,7 @@ function renderWaitingArea() {
         <div class="spinner"></div>
         <p>🎮 Game lobby — host can start the quiz</p>
         <p style="font-size: 0.85rem; margin-top: 0.5rem;">⏱️ Each question: 20 seconds</p>
-        <p style="font-size: 0.7rem; margin-top: 0.5rem; color: #fbbf24;">⏱️ Normal delay: ${NORMAL_DELAY/1000} seconds before next question</p>
+        <p style="font-size: 0.7rem; margin-top: 0.5rem; color: #fbbf24;"></p>
         ${isHost ? '<button id="hostStartQuizBtn" class="btn-secondary" style="margin-top: 12px;">🔥 Start Quiz Now</button>' : '<p style="margin-top: 1rem;">✨ Waiting for host to begin...</p>'}
       </div>
     `;
@@ -146,7 +146,6 @@ function renderQuestion(qData, timeLimit = 20) {
     <div class="options-grid" id="optionsContainer">${optsHtml}</div>
     <div id="questionFeedback" class="feedback-toast" style="display: none;"></div>
     <div style="font-size: 0.7rem; text-align: center; margin-top: 10px; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: bold;">
-      🏆 ${NORMAL_DELAY/1000} second delay before next question 🏆
     </div>
   `;
   

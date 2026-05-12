@@ -28,10 +28,16 @@ const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bin_aliyu@121';
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+// ============================================
+// DELAY CONFIGURATION - NORMAL SPEED
+// ============================================
+const DELAY_AFTER_ANSWER = 800;      // 0.8 seconds - Normal delay after answering
+const DELAY_TIME_UP = 800;           // 0.8 seconds - Normal delay after time's up
+const DELAY_ALL_ANSWERED = 500;      // 0.5 seconds - Delay when all players answered
+const DELAY_START_GAME = 500;        // 0.5 seconds - Delay before first question
+
 console.log(`\n🔧 [CONFIG] Environment: ${NODE_ENV}`);
-if (NODE_ENV === 'production') {
-  console.log('⚠️  [SECURITY] Using environment-based admin password');
-}
+console.log(`⏱️  [CONFIG] Normal delay after answer: ${DELAY_AFTER_ANSWER}ms`);
 
 // ============================================
 // ADMIN LOGIN ENDPOINT
@@ -217,7 +223,6 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Create room if it doesn't exist
     if (!rooms.has(roomId)) {
       rooms.set(roomId, {
         players: new Map(),
@@ -317,7 +322,7 @@ io.on('connection', (socket) => {
       if (room.gameActive && room.questions.length > 0) {
         sendQuestionWithTimer(roomId, room);
       }
-    }, 500);
+    }, DELAY_START_GAME);
   });
 
   function sendQuestionWithTimer(roomId, room) {
@@ -354,14 +359,15 @@ io.on('connection', (socket) => {
         room.timerInterval = null;
         
         const unansweredCount = room.players.size - room.answeredPlayers.size;
-        console.log(`⏰ [GAME] Time's up for Q${room.currentQuestionIndex + 1} (${room.answeredPlayers.size}/${room.players.size} answered)`);
+        console.log(`⏰ [GAME] Time's up for Q${room.currentQuestionIndex + 1}`);
         
         io.to(roomId).emit('timeUp', { 
-          message: `Time's up! ${unansweredCount} player(s) didn't answer.`,
+          message: `Time's up! Moving to next question...`,
           correctAnswer: room.questions[room.currentQuestionIndex].answer,
           correctAnswerText: room.questions[room.currentQuestionIndex].options[room.questions[room.currentQuestionIndex].answer]
         });
         
+        // NORMAL DELAY after time's up
         setTimeout(() => {
           if (room.gameActive) {
             room.currentQuestionIndex++;
@@ -371,7 +377,7 @@ io.on('connection', (socket) => {
               endGame(roomId, room);
             }
           }
-        }, 3000);
+        }, DELAY_TIME_UP);
       }
     }, 1000);
   }
@@ -389,7 +395,6 @@ io.on('connection', (socket) => {
     })).sort((a, b) => b.score - a.score);
     
     console.log(`🏆 [GAME] Game ended in ${roomId}`);
-    console.log(`📊 [GAME] Final scores:`, finalScores);
     
     io.to(roomId).emit('gameOver', { scores: finalScores });
   }
@@ -405,7 +410,6 @@ io.on('connection', (socket) => {
     const player = room.players.get(socket.id);
     if (!player) return;
     
-    // Prevent duplicate answers for same question
     if (room.answeredPlayers.has(socket.id)) {
       console.log(`⚠️  [GAME] ${playerName} already answered Q${room.currentQuestionIndex + 1}`);
       return;
@@ -422,24 +426,29 @@ io.on('connection', (socket) => {
       console.log(`❌ [GAME] ${playerName} wrong answer`);
     }
     
-    // Broadcast answer
-    io.to(roomId).emit('playerAnswered', {
-      playerName,
-      isCorrect,
-      totalAnswered: room.answeredPlayers.size,
-      totalPlayers: room.players.size
-    });
+    // Send private feedback to the player
+    const currentQ = room.questions[room.currentQuestionIndex];
+    if (isCorrect) {
+      socket.emit('answerFeedback', { 
+        correct: true, 
+        message: `✅ Correct! +1 point`,
+        yourScore: player.score
+      });
+    } else {
+      socket.emit('answerFeedback', { 
+        correct: false, 
+        message: `❌ Wrong! Correct answer: ${String.fromCharCode(65 + currentQ.answer)}. ${currentQ.options[currentQ.answer]}`,
+        yourScore: player.score
+      });
+    }
     
     // Check if all players answered
     if (room.answeredPlayers.size === room.players.size) {
-      console.log(`✅ [GAME] All players answered Q${room.currentQuestionIndex + 1}, advancing...`);
+      console.log(`✅ [GAME] All players answered Q${room.currentQuestionIndex + 1}`);
       clearInterval(room.timerInterval);
       room.timerInterval = null;
       
-      io.to(roomId).emit('allAnswered', {
-        message: 'All players answered! Moving to next question...'
-      });
-      
+      // NORMAL DELAY when all players answered
       setTimeout(() => {
         if (room.gameActive) {
           room.currentQuestionIndex++;
@@ -449,7 +458,7 @@ io.on('connection', (socket) => {
             endGame(roomId, room);
           }
         }
-      }, 2000);
+      }, DELAY_ALL_ANSWERED);
     }
   });
 
@@ -504,7 +513,7 @@ io.on('connection', (socket) => {
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
           rooms.delete(roomId);
-          console.log(`🗑️  [ROOM] Deleted empty room: ${roomId} (all players disconnected)`);
+          console.log(`🗑️  [ROOM] Deleted empty room: ${roomId}`);
         } else if (socket.id === room.hostId) {
           const newHostId = Array.from(room.players.keys())[0];
           room.hostId = newHostId;
@@ -525,21 +534,22 @@ app.get('*', (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`🚀 Computer Science Quiz Server Running!`);
   console.log(`${'='.repeat(60)}`);
   console.log(`📍 Local: http://localhost:${PORT}`);
   console.log(`📡 WebSocket: Ready for real-time connections`);
+  console.log(`⏱️  Normal delay after answer: ${DELAY_AFTER_ANSWER}ms`);
   console.log(`📚 Questions file: ${questionsFilePath}`);
   console.log(`\n🔐 Admin Login:`);
   console.log(`   Username: ${ADMIN_USERNAME}`);
   console.log(`   Password: ${NODE_ENV === 'production' ? '[from environment]' : ADMIN_PASSWORD}`);
   console.log(`\n💡 Quick Start:`);
   console.log(`   1. Open http://localhost:${PORT} in your browser`);
-  console.log(`   2. Create a room (e.g., "TEST123") and join`);
+  console.log(`   2. Create a room and join`);
   console.log(`   3. Share the room code with friends`);
-  console.log(`   4. Click "Admin Panel" and login with admin credentials`);
-  console.log(`   5. Add questions, then host starts the game!`);
+  console.log(`   4. Click "Admin Panel" to add questions`);
+  console.log(`   5. Host starts the game!`);
   console.log(`${'='.repeat(60)}\n`);
 });

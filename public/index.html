@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Computer Science Quiz</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="game-container">
+    <!-- LOBBY SCREEN -->
+    <div id="lobbyScreen" class="card screen">
+      <div style="text-align: center;">
+        <div class="logo"><img src="logo.png"></div>
+        <h1>Computer Science Quiz</h1>
+        <div class="sub">Sokoto State University<br>Faculty Of Computng</div>
+      </div>
+      
+      <div class="form-group">
+        <label>🎮 Room Code</label>
+        <input type="text" id="roomCodeInput" placeholder="e.g., quiz123" autocomplete="off">
+      </div>
+      
+      <div class="form-group">
+        <label>👤 Your Nickname</label>
+        <input type="text" id="playerNameInput" placeholder="Enter your name">
+      </div>
+      
+      <button id="joinRoomBtn" class="btn-primary">🚀 Join / Create Room</button>
+      <button id="adminBtn" class="btn-secondary" style="margin-top: 10px;">🔐 Admin Panel</button>
+      <div id="lobbyError" class="error-message"></div>
+      
+      <div class="features">
+        <div class="feature">✨ Private Rooms</div>
+        <div class="feature">⏱️ 20s Timer</div>
+        <div class="feature">⚡ Real-time</div>
+        <div class="feature">👑 Host Controls</div>
+      </div>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="adminModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🔐 Admin Login</h2>
+          <button id="closeModalBtn" class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="adminUsername" placeholder="Enter admin username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="adminPassword" placeholder="Enter admin password">
+        </div>
+        <button id="adminLoginBtn" class="btn-primary">Login</button>
+        <div id="adminError" class="error-message"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL (Separate from game) -->
+    <div id="adminPanelScreen" class="card screen hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>📚 Question Bank Management</h2>
+        <button id="closeAdminPanelBtn" class="close-btn">✕</button>
+      </div>
+      <div class="sub">Manage Computer Science questions (Admin only)</div>
+      
+      <div class="admin-stats">
+        <div class="stat">Total Questions: <span id="totalQuestions">0</span></div>
+      </div>
+      
+      <div id="adminQuestionsList" class="questions-list" style="max-height: 300px;"></div>
+      
+      <div class="add-question-form">
+        <h3>➕ Add New Question</h3>
+        <input type="text" id="newQuestionText" placeholder="Question e.g., What is OOP?" class="full-width">
+        
+        <div class="options-row">
+          <input type="text" id="opt0" placeholder="Option A">
+          <input type="text" id="opt1" placeholder="Option B">
+          <input type="text" id="opt2" placeholder="Option C">
+          <input type="text" id="opt3" placeholder="Option D">
+        </div>
+        
+        <select id="correctAnswerIndex" class="full-width">
+          <option value="0">Correct Answer: Option A</option>
+          <option value="1">Correct Answer: Option B</option>
+          <option value="2">Correct Answer: Option C</option>
+          <option value="3">Correct Answer: Option D</option>
+        </select>
+        
+        <div class="button-group">
+          <button id="adminAddQuestionBtn" class="btn-success">➕ Add Question</button>
+          <button id="adminSaveAllBtn" class="btn-primary">💾 Save All Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" class="card screen hidden">
+      <div class="room-info">
+        <div class="room-badge">
+          <span>📡 Room:</span>
+          <strong id="displayRoomCode">---</strong>
+        </div>
+        <div class="player-badge">
+          <span>🧑</span>
+          <strong id="playerNameDisplay"></strong>
+        </div>
+        <div id="hostBadge" class="host-badge hidden">👑 Host</div>
+      </div>
+      
+      <!-- Timer Display -->
+      <div id="timerDisplay" class="timer hidden">
+        <div class="timer-circle">
+          <span id="timerSeconds">20</span>
+          <span>seconds</span>
+        </div>
+      </div>
+      
+      <!-- Dynamic game area -->
+      <div id="gameDynamicArea">
+        <div class="waiting-message">
+          <div class="spinner"></div>
+          <p>⏳ Waiting for host to start quiz...</p>
+          <button id="startGameBtn" class="btn-secondary hidden">▶ Start Quiz</button>
+        </div>
+      </div>
+
+      <div class="score-panel">
+        <div class="score-label">
+          <span>🏆</span>
+          <span>Your Score</span>
+        </div>
+        <div class="score-number" id="currentScore">0</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/client.js"></script>
+</body>
+</html>

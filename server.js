@@ -404,23 +404,27 @@ io.on('connection', (socket) => {
     //   totalPlayers: room.players.size
     // });
     
-    if (room.answeredPlayers.size === room.players.size) {
-      if (room.timerInterval) {
-        clearInterval(room.timerInterval);
-        room.timerInterval = null;
-      }
-      
-      setTimeout(() => {
-        if (room.gameActive) {
-          room.currentQuestionIndex++;
-          if (room.currentQuestionIndex < room.questions.length) {
-            sendQuestionWithTimer(roomId, room);
-          } else {
-            endGame(roomId, room);
-          }
+    // INSTANT FIX: Player moves immediately instead of waiting for all players
+    socket.emit('playerReadyForNext', { roomId: roomId });
+    
+    setTimeout(() => {
+      if (room.gameActive && room.answeredPlayers.has(socket.id)) {
+        const nextIndex = room.currentQuestionIndex + 1;
+        if (nextIndex < room.questions.length) {
+          const nextQuestion = room.questions[nextIndex];
+          socket.emit('nextQuestion', {
+            questionData: nextQuestion,
+            qIndex: nextIndex,
+            total: room.questions.length,
+            timeLimit: 20
+          });
+          // Increment index to avoid duplicate questions
+          room.currentQuestionIndex = nextIndex;
+        } else {
+          endGame(roomId, room);
         }
-      }, 1500);
-    }
+      }
+    }, 200);
   });
 
   socket.on('leaveRoom', (data) => {

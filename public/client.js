@@ -215,13 +215,13 @@ function renderQuestion(qData, timeLimit = 20) {
         }
       });
       
-      // Auto move to next question after 1.5 seconds
+      // Auto move to next question after 200ms (INSTANT FIX)
       setTimeout(() => {
         if (gameActive) {
           // Emit that this player is ready for next question
           socket.emit('playerReadyForNext', { roomId: currentRoomId, playerName: currentPlayerName });
         }
-      }, 1500);
+      }, 200);
     });
   });
 }
@@ -232,7 +232,7 @@ function showGameOver(scoresArray) {
   
   let rankingHtml = `
     <div class="waiting-message">
-      <h2 style="background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 2rem; margin-bottom: 1rem;">🏆 GAME OVER 🏆</h2>
+      <h2 style="background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 2rem; margin-bottom: 1rem;">🏆 GAME OVER! 🏆</h2>
       <h3 style="margin-bottom: 1rem; color: #fbbf24;">Final Rankings</h3>
       <ul style="text-align: left; margin-top: 1rem;">
   `;

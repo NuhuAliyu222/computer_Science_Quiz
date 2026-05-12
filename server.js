@@ -397,12 +397,12 @@ io.on('connection', (socket) => {
     
     room.answeredPlayers.add(socket.id);
     
-    io.to(roomId).emit('playerAnswered', {
-      playerName,
-      isCorrect,
-      totalAnswered: room.answeredPlayers.size,
-      totalPlayers: room.players.size
-    });
+    // io.to(roomId).emit('playerAnswered', {
+    //   playerName,
+    //   isCorrect,
+    //   totalAnswered: room.answeredPlayers.size,
+    //   totalPlayers: room.players.size
+    // });
     
     if (room.answeredPlayers.size === room.players.size) {
       if (room.timerInterval) {

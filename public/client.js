@@ -19,6 +19,11 @@ const currentScoreSpan = document.getElementById('currentScore');
 const timerDisplay = document.getElementById('timerDisplay');
 const timerSecondsSpan = document.getElementById('timerSeconds');
 
+// ============================================
+// DELAY CONFIGURATION - NORMAL SPEED
+// ============================================
+const NORMAL_DELAY = 800;  // 0.8 seconds - Normal delay before next question
+
 // State variables
 let currentRoomId = null;
 let currentPlayerName = '';
@@ -67,6 +72,7 @@ function renderWaitingArea() {
         <div class="spinner"></div>
         <p>🎮 Game lobby — host can start the quiz</p>
         <p style="font-size: 0.85rem; margin-top: 0.5rem;">⏱️ Each question: 20 seconds</p>
+        <p style="font-size: 0.7rem; margin-top: 0.5rem; color: #fbbf24;">⏱️ Normal delay: ${NORMAL_DELAY/1000} seconds before next question</p>
         ${isHost ? '<button id="hostStartQuizBtn" class="btn-secondary" style="margin-top: 12px;">🔥 Start Quiz Now</button>' : '<p style="margin-top: 1rem;">✨ Waiting for host to begin...</p>'}
       </div>
     `;
@@ -140,7 +146,7 @@ function renderQuestion(qData, timeLimit = 20) {
     <div class="options-grid" id="optionsContainer">${optsHtml}</div>
     <div id="questionFeedback" class="feedback-toast" style="display: none;"></div>
     <div style="font-size: 0.7rem; text-align: center; margin-top: 10px; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: bold;">
-      🏆 Answer instantly to move to next question! 🏆
+      🏆 ${NORMAL_DELAY/1000} second delay before next question 🏆
     </div>
   `;
   
@@ -215,13 +221,13 @@ function renderQuestion(qData, timeLimit = 20) {
         }
       });
       
-      // Auto move to next question after 200ms (INSTANT FIX)
+      // NORMAL DELAY before next question (800ms)
       setTimeout(() => {
         if (gameActive) {
           // Emit that this player is ready for next question
           socket.emit('playerReadyForNext', { roomId: currentRoomId, playerName: currentPlayerName });
         }
-      }, 200);
+      }, NORMAL_DELAY);
     });
   });
 }
@@ -599,7 +605,7 @@ socket.on('timeUp', ({ message, correctAnswer, correctAnswerText }) => {
       fb.style.fontSize = '1.1rem';
       fb.style.border = '3px solid #f59e0b';
       fb.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.5)';
-      fb.innerHTML = `⏰ TIME'S UP! ⏰<br>🏆 Correct answer: ${String.fromCharCode(65 + correctAnswer)}. ${escapeHtml(correctAnswerText)} 🏆<br>⚡ Next question coming soon! ⚡`;
+      fb.innerHTML = `⏰ TIME'S UP! ⏰<br>🏆 Correct answer: ${String.fromCharCode(65 + correctAnswer)}. ${escapeHtml(correctAnswerText)} 🏆<br>⚡ Next question in ${NORMAL_DELAY/1000} seconds ⚡`;
     }
     
     document.querySelectorAll('.option-btn').forEach(btn => {

@@ -197,7 +197,8 @@ io.on('connection', (socket) => {
         questions: loadQuestions(),
         gameActive: false,
         currentQuestionIndex: 0,
-        answeredPlayers: new Set(),
+        // REMOVED - No answer tracking
+        // answeredPlayers: new Set(),
         hostId: null,
         scores: new Map(),
         timerInterval: null,
@@ -273,7 +274,8 @@ io.on('connection', (socket) => {
 
     room.gameActive = true;
     room.currentQuestionIndex = 0;
-    room.answeredPlayers.clear();
+    // REMOVED - No answer tracking
+    // room.answeredPlayers.clear();
     room.timeRemaining = 20;
     
     for (let [playerId, player] of room.players.entries()) {
@@ -296,7 +298,8 @@ io.on('connection', (socket) => {
     if (!room.gameActive) return;
     
     const currentQuestion = room.questions[room.currentQuestionIndex];
-    room.answeredPlayers.clear();
+    // REMOVED - No answer tracking
+    // room.answeredPlayers.clear();
     room.timeRemaining = 20;
     
     io.to(roomId).emit('nextQuestion', {
@@ -323,36 +326,23 @@ io.on('connection', (socket) => {
         clearInterval(room.timerInterval);
         room.timerInterval = null;
         
-        const unansweredCount = room.players.size - room.answeredPlayers.size;
-        if (unansweredCount > 0) {
-          io.to(roomId).emit('timeUp', { 
-            message: `Time's up! Moving to next question...`,
-            correctAnswer: room.questions[room.currentQuestionIndex].answer,
-            correctAnswerText: room.questions[room.currentQuestionIndex].options[room.questions[room.currentQuestionIndex].answer]
-          });
-          
-          setTimeout(() => {
-            if (room.gameActive) {
-              room.currentQuestionIndex++;
-              if (room.currentQuestionIndex < room.questions.length) {
-                sendQuestionWithTimer(roomId, room);
-              } else {
-                endGame(roomId, room);
-              }
+        // REMOVED - No longer checking unansweredCount since we don't track answered players
+        io.to(roomId).emit('timeUp', { 
+          message: `Time's up! Moving to next question...`,
+          correctAnswer: room.questions[room.currentQuestionIndex].answer,
+          correctAnswerText: room.questions[room.currentQuestionIndex].options[room.questions[room.currentQuestionIndex].answer]
+        });
+        
+        setTimeout(() => {
+          if (room.gameActive) {
+            room.currentQuestionIndex++;
+            if (room.currentQuestionIndex < room.questions.length) {
+              sendQuestionWithTimer(roomId, room);
+            } else {
+              endGame(roomId, room);
             }
-          }, 3000);
-        } else {
-          setTimeout(() => {
-            if (room.gameActive) {
-              room.currentQuestionIndex++;
-              if (room.currentQuestionIndex < room.questions.length) {
-                sendQuestionWithTimer(roomId, room);
-              } else {
-                endGame(roomId, room);
-              }
-            }
-          }, 1000);
-        }
+          }
+        }, 3000);
       }
     }, 1000);
   }
@@ -384,10 +374,11 @@ io.on('connection', (socket) => {
     const player = room.players.get(socket.id);
     if (!player) return;
     
-    if (room.answeredPlayers.has(socket.id)) {
-      socket.emit('errorMessage', 'You already answered this question');
-      return;
-    }
+    // REMOVED - Multiple answers allowed
+    // if (room.answeredPlayers.has(socket.id)) {
+    //   socket.emit('errorMessage', 'You already answered this question');
+    //   // return; // REMOVED - Continue allowing answer
+    // }
     
     if (isCorrect) {
       player.score += 1;
@@ -395,7 +386,8 @@ io.on('connection', (socket) => {
       socket.emit('scoreUpdate', { score: player.score });
     }
     
-    room.answeredPlayers.add(socket.id);
+    // REMOVED - No tracking of answered players
+    // room.answeredPlayers.add(socket.id);
     
     // io.to(roomId).emit('playerAnswered', {
     //   playerName,
@@ -408,7 +400,7 @@ io.on('connection', (socket) => {
     socket.emit('playerReadyForNext', { roomId: roomId });
     
     setTimeout(() => {
-      if (room.gameActive && room.answeredPlayers.has(socket.id)) {
+      if (room.gameActive) {
         const nextIndex = room.currentQuestionIndex + 1;
         if (nextIndex < room.questions.length) {
           const nextQuestion = room.questions[nextIndex];

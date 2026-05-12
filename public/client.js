@@ -350,7 +350,7 @@ async function adminLogin() {
       setTimeout(() => toast.remove(), 3000);
       
     } else {
-      if (errorDiv) errorDiv.innerText = data.message || 'Login failed. Use admin / bin_aliyu@121';
+      if (errorDiv) errorDiv.innerText = data.message || 'Login failed.';
     }
   } catch (error) {
     console.error('Login error:', error);

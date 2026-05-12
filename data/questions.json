@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "question": "What does CPU stand for?",
+    "options": [
+      "Central Processing Unit",
+      "Computer Personal Unit",
+      "Central Program Utility",
+      "Core Processing Utility"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 2,
+    "question": "Which data structure uses LIFO (Last In First Out)?",
+    "options": [
+      "Queue",
+      "Array",
+      "Stack",
+      "Linked List"
+    ],
+    "answer": 2
+  },
+  {
+    "id": 3,
+    "question": "What does HTTP stand for?",
+    "options": [
+      "HyperText Transfer Protocol",
+      "High Transfer Text Protocol",
+      "Hyper Transfer Text Protocol",
+      "HyperText Transmission Program"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 4,
+    "question": "Which of these is a JavaScript framework?",
+    "options": [
+      "Django",
+      "Flask",
+      "React",
+      "Laravel"
+    ],
+    "answer": 2
+  },
+  {
+    "id": 5,
+    "question": "What is the time complexity of binary search?",
+    "options": [
+      "O(n)",
+      "O(log n)",
+      "O(n²)",
+      "O(1)"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 6,
+    "question": "What does SQL stand for?",
+    "options": [
+      "Structured Query Language",
+      "Simple Query Language",
+      "Structured Question Language",
+      "System Query Language"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 7,
+    "question": "Which programming language is primarily used for Android development?",
+    "options": [
+      "Swift",
+      "Kotlin/Java",
+      "C#",
+      "Python"
+    ],
+    "answer": 1
+  },
+  {
+    "id": 8,
+    "question": "What is the main purpose of Git?",
+    "options": [
+      "Version Control",
+      "Web Development",
+      "Database Management",
+      "Game Development"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 9,
+    "question": "What does RAM stand for?",
+    "options": [
+      "Random Access Memory",
+      "Read Access Memory",
+      "Rapid Access Memory",
+      "Readily Available Memory"
+    ],
+    "answer": 0
+  },
+  {
+    "id": 10,
+    "question": "Which company created the Java programming language?",
+    "options": [
+      "Microsoft",
+      "Apple",
+      "Sun Microsystems",
+      "IBM"
+    ],
+    "answer": 2
+  }
+]

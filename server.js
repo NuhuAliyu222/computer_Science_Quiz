@@ -30,7 +30,7 @@ const DELAY_START_GAME = 500;        // 0.5 seconds - Delay before first questio
 
 // Admin credentials
 const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'quizmaster2024';
+const ADMIN_PASSWORD = 'bin_aliyu@121';
 
 // Admin login endpoint
 app.post('/api/admin/login', (req, res) => {
@@ -45,7 +45,7 @@ app.post('/api/admin/login', (req, res) => {
   } else {
     res.status(401).json({ 
       success: false, 
-      message: 'Invalid credentials. Use admin / quizmaster2024' 
+      message: 'Invalid credentials. Use admin / bin_aliyu@121' 
     });
   }
 });

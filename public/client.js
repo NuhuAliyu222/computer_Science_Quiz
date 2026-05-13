@@ -69,7 +69,6 @@ function renderWaitingArea() {
         <div class="spinner"></div>
         <p>🎮 Game lobby — host can start the quiz</p>
         <p style="font-size: 0.85rem; margin-top: 0.5rem;">⏱️ Each question: 20 seconds</p>
-        <p style="font-size: 0.7rem; margin-top: 0.5rem; color: #10b981;">🔒 Privacy: Other players cannot see your answers</p>
         ${isHost ? '<button id="hostStartQuizBtn" class="btn-secondary" style="margin-top: 12px;">🔥 Start Quiz Now</button>' : '<p style="margin-top: 1rem;">✨ Waiting for host to begin...</p>'}
       </div>
     `;

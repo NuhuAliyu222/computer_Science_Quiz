@@ -23,14 +23,14 @@ app.use(express.static('public'));
 // ============================================
 // DELAY CONFIGURATION - NORMAL SPEED
 // ============================================
-const DELAY_AFTER_ANSWER = 800;      // 0.8 seconds - Normal delay after answering
-const DELAY_TIME_UP = 800;           // 0.8 seconds - Normal delay after time's up
-const DELAY_ALL_ANSWERED = 500;      // 0.5 seconds - Delay when all players answered
-const DELAY_START_GAME = 500;        // 0.5 seconds - Delay before first question
+const DELAY_AFTER_ANSWER = 800;
+const DELAY_TIME_UP = 800;
+const DELAY_ALL_ANSWERED = 500;
+const DELAY_START_GAME = 500;
 
 // Admin credentials
 const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'bin_aliyu@121';
+const ADMIN_PASSWORD = 'quizmaster2024';
 
 // Admin login endpoint
 app.post('/api/admin/login', (req, res) => {
@@ -67,7 +67,7 @@ app.get('/api/questions', (req, res) => {
   }
 });
 
-// Add new question
+// Add new question (Permanent save)
 app.post('/api/questions', (req, res) => {
   try {
     const { question, options, answer } = req.body;
@@ -84,20 +84,22 @@ app.post('/api/questions', (req, res) => {
       id: newId,
       question: question,
       options: options,
-      answer: answer
+      answer: answer,
+      createdAt: new Date().toISOString()
     };
     
     questions.push(newQuestion);
     fs.writeFileSync(questionsFilePath, JSON.stringify(questions, null, 2));
     
-    res.json({ success: true, message: 'Question added', question: newQuestion });
+    console.log(`📚 [PERMANENT] Question saved to disk: ID ${newId}`);
+    res.json({ success: true, message: 'Question saved permanently', question: newQuestion });
   } catch (error) {
     console.error('Error adding question:', error);
     res.status(500).json({ success: false, message: 'Failed to add question' });
   }
 });
 
-// Delete question
+// Delete question (Permanent)
 app.delete('/api/questions/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -116,7 +118,8 @@ app.delete('/api/questions/:id', (req, res) => {
     }
     
     fs.writeFileSync(questionsFilePath, JSON.stringify(filteredQuestions, null, 2));
-    res.json({ success: true, message: 'Question deleted' });
+    console.log(`🗑️ [PERMANENT] Question deleted: ID ${id}`);
+    res.json({ success: true, message: 'Question deleted permanently' });
   } catch (error) {
     console.error('Error deleting question:', error);
     res.status(500).json({ success: false, message: 'Failed to delete question' });
@@ -129,7 +132,6 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-// Questions file path
 const questionsFilePath = path.join(dataDir, 'questions.json');
 
 // Initialize questions.json if it doesn't exist
@@ -139,38 +141,42 @@ if (!fs.existsSync(questionsFilePath)) {
       id: 1,
       question: "What does CPU stand for?",
       options: ["Central Processing Unit", "Computer Personal Unit", "Central Program Utility", "Core Processing Utility"],
-      answer: 0
+      answer: 0,
+      createdAt: new Date().toISOString()
     },
     {
       id: 2,
-      question: "Which data structure uses LIFO (Last In First Out)?",
+      question: "Which data structure uses LIFO?",
       options: ["Queue", "Array", "Stack", "Linked List"],
-      answer: 2
+      answer: 2,
+      createdAt: new Date().toISOString()
     },
     {
       id: 3,
       question: "What does HTTP stand for?",
       options: ["HyperText Transfer Protocol", "High Transfer Text Protocol", "Hyper Transfer Text Protocol", "HyperText Transmission Program"],
-      answer: 0
+      answer: 0,
+      createdAt: new Date().toISOString()
     },
     {
       id: 4,
-      question: "Which of these is a JavaScript framework?",
+      question: "Which is a JavaScript framework?",
       options: ["Django", "Flask", "React", "Laravel"],
-      answer: 2
+      answer: 2,
+      createdAt: new Date().toISOString()
     },
     {
       id: 5,
-      question: "What is the time complexity of binary search?",
+      question: "Time complexity of binary search?",
       options: ["O(n)", "O(log n)", "O(n²)", "O(1)"],
-      answer: 1
+      answer: 1,
+      createdAt: new Date().toISOString()
     }
   ];
   fs.writeFileSync(questionsFilePath, JSON.stringify(defaultQuestions, null, 2));
-  console.log('✅ Created questions.json with default Computer Science questions');
+  console.log('✅ Created questions.json with default questions');
 }
 
-// Helper function to load questions
 function loadQuestions() {
   try {
     const data = fs.readFileSync(questionsFilePath, 'utf8');
@@ -184,11 +190,9 @@ function loadQuestions() {
 // Game state storage
 const rooms = new Map();
 
-// Socket.io connection handling
 io.on('connection', (socket) => {
   console.log(`New client connected: ${socket.id}`);
 
-  // Handle joining a room
   socket.on('joinRoom', (data) => {
     const { roomId, playerName } = data;
     
@@ -219,7 +223,7 @@ io.on('connection', (socket) => {
     }
 
     if (room.gameActive) {
-      socket.emit('errorMessage', 'Game already in progress. Please wait for next round.');
+      socket.emit('errorMessage', 'Game already in progress. Please wait.');
       return;
     }
 
@@ -243,15 +247,14 @@ io.on('connection', (socket) => {
       questions: room.questions
     });
 
+    // PRIVATE - Only notify that someone joined, not who
     socket.to(roomId).emit('playerJoined', {
-      playerName,
       playersCount: room.players.size
     });
 
-    console.log(`${playerName} joined room ${roomId} (${isHost ? 'Host' : 'Player'})`);
+    console.log(`${playerName} joined room ${roomId}`);
   });
 
-  // Handle starting the game
   socket.on('startGame', (data) => {
     const { roomId } = data;
     
@@ -268,12 +271,12 @@ io.on('connection', (socket) => {
     }
 
     if (!room.questions || room.questions.length === 0) {
-      socket.emit('errorMessage', 'No questions available. Please ask admin to add questions.');
+      socket.emit('errorMessage', 'No questions available.');
       return;
     }
 
     if (room.players.size < 1) {
-      socket.emit('errorMessage', 'Need at least one player to start');
+      socket.emit('errorMessage', 'Need at least one player');
       return;
     }
 
@@ -295,7 +298,7 @@ io.on('connection', (socket) => {
       }
     }, DELAY_START_GAME);
 
-    console.log(`Game started in room ${roomId} with ${room.players.size} players`);
+    console.log(`Game started in room ${roomId}`);
   });
 
   function sendQuestionWithTimer(roomId, room) {
@@ -389,7 +392,7 @@ io.on('connection', (socket) => {
     
     room.answeredPlayers.add(socket.id);
     
-    // Send private feedback
+    // PRIVATE FEEDBACK - Only the answering player sees result
     const currentQ = room.questions[room.currentQuestionIndex];
     if (isCorrect) {
       socket.emit('answerFeedback', { 
@@ -405,9 +408,8 @@ io.on('connection', (socket) => {
       });
     }
     
-    // Broadcast to others that someone answered (without revealing correctness)
-    io.to(roomId).emit('playerAnswered', {
-      playerName,
+    // PRIVATE - Only broadcast that someone answered, not who or if correct
+    io.to(roomId).emit('someoneAnswered', {
       totalAnswered: room.answeredPlayers.size,
       totalPlayers: room.players.size
     });
@@ -431,6 +433,40 @@ io.on('connection', (socket) => {
     }
   });
 
+  // EXIT BUTTON HANDLER - User quitting during game
+  socket.on('exitGame', (data) => {
+    const { roomId, playerName } = data;
+    
+    if (rooms.has(roomId)) {
+      const room = rooms.get(roomId);
+      const player = room.players.get(socket.id);
+      
+      if (player) {
+        room.players.delete(socket.id);
+        socket.leave(roomId);
+        
+        // Notify others that someone left (without name)
+        io.to(roomId).emit('playerLeft', {
+          playersCount: room.players.size
+        });
+        
+        if (room.players.size === 0) {
+          if (room.timerInterval) clearInterval(room.timerInterval);
+          rooms.delete(roomId);
+          console.log(`Room ${roomId} deleted (all players left)`);
+        } else if (socket.id === room.hostId && room.players.size > 0) {
+          const newHostId = Array.from(room.players.keys())[0];
+          room.hostId = newHostId;
+          const newHost = room.players.get(newHostId);
+          io.to(roomId).emit('newHost', { newHostName: newHost.name });
+        }
+        
+        socket.emit('exitConfirmed', { message: 'You have left the game' });
+        console.log(`${player.name} exited game`);
+      }
+    }
+  });
+
   socket.on('leaveRoom', (data) => {
     const { roomId } = data;
     
@@ -442,8 +478,7 @@ io.on('connection', (socket) => {
         room.players.delete(socket.id);
         socket.leave(roomId);
         
-        socket.to(roomId).emit('playerLeft', {
-          playerName: player.name,
+        io.to(roomId).emit('playerLeft', {
           playersCount: room.players.size
         });
         
@@ -471,7 +506,6 @@ io.on('connection', (socket) => {
         room.players.delete(socket.id);
         
         io.to(roomId).emit('playerLeft', {
-          playerName: player.name,
           playersCount: room.players.size
         });
         
@@ -495,20 +529,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`\n🚀 CS Quiz Arena Server Running!`);
   console.log(`📍 Local: http://localhost:${PORT}`);
-  console.log(`📡 WebSocket: Ready for real-time connections`);
-  console.log(`${DELAY_AFTER_ANSWER}ms`);
-  console.log(`\n🔐 Admin Login:`);
-  console.log(`   Username: ${ADMIN_USERNAME}`);
-  console.log(`   Password: ${ADMIN_PASSWORD}`);
-  console.log(`\n💡 Quick Start:`);
-  console.log(`   1. Open http://localhost:${PORT} in your browser`);
-  console.log(`   2. Create a room and join`);
-  console.log(`   3. Share the room code with friends`);
-  console.log(`   4. Click "Admin Panel" to add questions`);
-  console.log(`   5. Host starts the game!\n`);
+  console.log(`🔒 Privacy mode: ON (players cannot see each other's answers)`);
+  console.log(`💾 Permanent save: Questions saved to disk`);
+  console.log(`🚪 Exit button: Available during gameplay`);
+  console.log(`\n🔐 Admin Login: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}\n`);
 });

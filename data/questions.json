@@ -1,112 +1,652 @@
 [
-  {
-    "id": 1,
-    "question": "What does CPU stand for?",
-    "options": [
-      "Central Processing Unit",
-      "Computer Personal Unit",
-      "Central Program Utility",
-      "Core Processing Utility"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 2,
-    "question": "Which data structure uses LIFO (Last In First Out)?",
-    "options": [
-      "Queue",
-      "Array",
-      "Stack",
-      "Linked List"
-    ],
-    "answer": 2
-  },
-  {
-    "id": 3,
-    "question": "What does HTTP stand for?",
-    "options": [
-      "HyperText Transfer Protocol",
-      "High Transfer Text Protocol",
-      "Hyper Transfer Text Protocol",
-      "HyperText Transmission Program"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 4,
-    "question": "Which of these is a JavaScript framework?",
-    "options": [
-      "Django",
-      "Flask",
-      "React",
-      "Laravel"
-    ],
-    "answer": 2
-  },
-  {
-    "id": 5,
-    "question": "What is the time complexity of binary search?",
-    "options": [
-      "O(n)",
-      "O(log n)",
-      "O(n²)",
-      "O(1)"
-    ],
-    "answer": 1
-  },
-  {
-    "id": 6,
-    "question": "What does SQL stand for?",
-    "options": [
-      "Structured Query Language",
-      "Simple Query Language",
-      "Structured Question Language",
-      "System Query Language"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 7,
-    "question": "Which programming language is primarily used for Android development?",
-    "options": [
-      "Swift",
-      "Kotlin/Java",
-      "C#",
-      "Python"
-    ],
-    "answer": 1
-  },
-  {
-    "id": 8,
-    "question": "What is the main purpose of Git?",
-    "options": [
-      "Version Control",
-      "Web Development",
-      "Database Management",
-      "Game Development"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 9,
-    "question": "What does RAM stand for?",
-    "options": [
-      "Random Access Memory",
-      "Read Access Memory",
-      "Rapid Access Memory",
-      "Readily Available Memory"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 10,
-    "question": "Which company created the Java programming language?",
-    "options": [
-      "Microsoft",
-      "Apple",
-      "Sun Microsystems",
-      "IBM"
-    ],
-    "answer": 2
-  }
-]
+    {
+      "id": 1,
+      "section": "SECTION A — Fundamentals",
+      "question": "A company wants to show yearly profit trends, seasonal patterns, and sudden drops in revenue. Which visualization is MOST appropriate and why?",
+      "options": [
+        "A. Pie Chart",
+        "B. Line Chart",
+        "C. Histogram",
+        "D. Boxplot"
+      ],
+      "answer": "B",
+      "explanation": "A line chart is best for time-series data because it clearly shows trends over time, seasonal patterns, and sudden increases or decreases."
+    },
+    {
+      "id": 2,
+      "section": "SECTION A — Fundamentals",
+      "question": "A hospital dashboard uses pie charts to compare patient ages, treatment costs, and survival rates. Explain why this is a poor visualization choice and recommend better alternatives.",
+      "options": [
+        "A. Pie charts are only for geographical data",
+        "B. Pie charts cannot effectively compare continuous numerical values",
+        "C. Pie charts only work for stock prices",
+        "D. Pie charts are used only in Seaborn"
+      ],
+      "answer": "B",
+      "explanation": "Pie charts cannot effectively compare continuous numerical values. Better alternatives include Histograms for age, Bar charts for costs, and Line/Bar charts for survival rates."
+    },
+    {
+      "id": 3,
+      "section": "SECTION A — Fundamentals",
+      "question": "You are given customer gender, country, and marital status. Identify the data type and best chart.",
+      "options": [
+        "A. Continuous data → Histogram",
+        "B. Numerical data → Heatmap",
+        "C. Nominal categorical data → Bar chart or pie chart",
+        "D. Time-series data → Line chart"
+      ],
+      "answer": "C",
+      "explanation": "Gender, Country, and Marital status are all Nominal categorical data types. Bar charts or pie charts are best suited for these."
+    },
+    {
+      "id": 4,
+      "section": "SECTION A — Fundamentals",
+      "question": "A manager wants to compare sales across departments while also showing contribution to total company revenue.",
+      "options": [
+        "A. Scatterplot",
+        "B. Stacked Bar Chart",
+        "C. Histogram",
+        "D. Heatmap"
+      ],
+      "answer": "B",
+      "explanation": "A stacked bar chart allows for comparison across categories (departments) while simultaneously showing how parts contribute to the whole."
+    },
+    {
+      "id": 5,
+      "section": "SECTION A — Fundamentals",
+      "question": "Why might a heatmap be more effective than a table for rainfall trends?",
+      "options": [
+        "A. Heatmaps remove all data values",
+        "B. Heatmaps use colors to reveal patterns quickly",
+        "C. Tables are only for business reports",
+        "D. Heatmaps cannot display large data"
+      ],
+      "answer": "B",
+      "explanation": "Color intensity helps viewers quickly identify high rainfall, low rainfall, patterns, and anomalies without reading every cell."
+    },
+    {
+      "id": 6,
+      "section": "SECTION A — Fundamentals",
+      "question": "Would exploratory or explanatory visualization be more appropriate first?",
+      "options": [
+        "A. Explanatory visualization",
+        "B. Exploratory visualization",
+        "C. Pie chart visualization",
+        "D. Decorative visualization"
+      ],
+      "answer": "B",
+      "explanation": "If a dataset is large, messy, or contains missing values, exploratory visualization is necessary to discover patterns and issues before communicating findings."
+    },
+    {
+      "id": 7,
+      "section": "SECTION A — Fundamentals",
+      "question": "Difference between information and insight.",
+      "options": [
+        "A. They are exactly the same",
+        "B. Information is processed data, insight is meaningful understanding",
+        "C. Insight is raw data",
+        "D. Information is visualization only"
+      ],
+      "answer": "B",
+      "explanation": "Information is data that has been processed (e.g., 'Sales dropped 20%'). Insight is the 'why' or the actionable understanding (e.g., 'Sales dropped because of fuel prices')."
+    },
+    {
+      "id": 8,
+      "section": "SECTION A — Fundamentals",
+      "question": "Which visualization principle is violated when too many decorative elements are used?",
+      "options": [
+        "A. Correlation principle",
+        "B. Data-Ink Ratio principle",
+        "C. Sorting principle",
+        "D. Filtering principle"
+      ],
+      "answer": "B",
+      "explanation": "The Data-Ink Ratio principle states that 'ink' should be used primarily for data. Decorative elements create 'chartjunk' and reduce clarity."
+    },
+    {
+      "id": 9,
+      "section": "SECTION A — Fundamentals",
+      "question": "Which visualization best reveals correlation between study hours, sleep hours, and exam scores?",
+      "options": [
+        "A. Pie chart",
+        "B. Scatterplot",
+        "C. Histogram",
+        "D. Treemap"
+      ],
+      "answer": "B",
+      "explanation": "Scatterplots are designed to show relationships and correlations between multiple continuous variables."
+    },
+    {
+      "id": 10,
+      "section": "SECTION A — Fundamentals",
+      "question": "How do Gestalt principles improve dashboard design?",
+      "options": [
+        "A. By adding decorations",
+        "B. By improving grouping and visual perception",
+        "C. By increasing chart complexity",
+        "D. By removing all labels"
+      ],
+      "answer": "B",
+      "explanation": "Gestalt principles help users recognize relationships, follow visual flow, and understand grouped information naturally."
+    },
+    {
+      "id": 11,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "Which Pandas operations are best for cleaning missing ages, duplicates, and incorrect types?",
+      "options": [
+        "A. dropna(), drop_duplicates(), astype()",
+        "B. plot(), mean(), sum()",
+        "C. heatmap(), pairplot()",
+        "D. legend(), xlabel()"
+      ],
+      "answer": "A",
+      "explanation": "dropna() handles missing values, drop_duplicates() removes repeated rows, and astype() converts data types."
+    },
+    {
+      "id": 12,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "What is the difference between df['score'] and df[['score']]?",
+      "options": [
+        "A. Both return DataFrame",
+        "B. First returns Series, second returns DataFrame",
+        "C. Both return list",
+        "D. First returns integer"
+      ],
+      "answer": "B",
+      "explanation": "In Pandas, a single bracket returns a Series, while double brackets return a DataFrame."
+    },
+    {
+      "id": 13,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "Why would aggregation fail for: '$500', '$700'?",
+      "options": [
+        "A. Because values are strings, not numeric",
+        "B. Because strings are faster",
+        "C. Because aggregation only works in Excel",
+        "D. Because Pandas cannot read currency"
+      ],
+      "answer": "A",
+      "explanation": "Values containing currency symbols are treated as strings (objects). You must remove the symbol and convert to float/int to perform math."
+    },
+    {
+      "id": 14,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "Why might a column not appear in df.describe()?",
+      "options": [
+        "A. Column may contain non-numeric data",
+        "B. Column may contain missing values only",
+        "C. Both A and B",
+        "D. None"
+      ],
+      "answer": "C",
+      "explanation": "By default, describe() summarizes numeric columns. Non-numeric or completely empty columns are often excluded."
+    },
+    {
+      "id": 15,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "Why is using df.dropna() dangerous?",
+      "options": [
+        "A. It may remove too much important data",
+        "B. It creates extra columns",
+        "C. It changes colors",
+        "D. It increases duplicates"
+      ],
+      "answer": "A",
+      "explanation": "dropna() removes the entire row if a single value is missing; if many rows have small gaps, you could lose most of your dataset."
+    },
+    {
+      "id": 16,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "Difference between discrete and continuous data.",
+      "options": [
+        "A. Discrete = measurable, Continuous = countable",
+        "B. Discrete = countable, Continuous = measurable",
+        "C. Both are categorical",
+        "D. Both are nominal"
+      ],
+      "answer": "B",
+      "explanation": "Discrete data is countable (e.g., number of students), while continuous data is measurable (e.g., height or temperature)."
+    },
+    {
+      "id": 17,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "Which Pandas function is most suitable for grouping data to find averages?",
+      "options": [
+        "A. groupby()",
+        "B. heatmap()",
+        "C. scatterplot()",
+        "D. pairplot()"
+      ],
+      "answer": "A",
+      "explanation": "groupby() is the standard method for splitting data into groups based on some criteria and applying a function like mean()."
+    },
+    {
+      "id": 18,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "True or False: 'Every column in a DataFrame is a Series.'",
+      "options": [
+        "A. False",
+        "B. True because each column has indexed values",
+        "C. True because DataFrame stores images",
+        "D. False because Series has no values"
+      ],
+      "answer": "B",
+      "explanation": "A DataFrame is essentially a container for multiple Series objects that share the same index."
+    },
+    {
+      "id": 19,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "What does df.shape represent?",
+      "options": [
+        "A. Column colors",
+        "B. Rows and columns count",
+        "C. Missing values",
+        "D. Average values"
+      ],
+      "answer": "B",
+      "explanation": "df.shape returns a tuple representing the dimensionality (number of rows, number of columns)."
+    },
+    {
+      "id": 20,
+      "section": "SECTION B — Pandas & Data Cleaning",
+      "question": "Why is df.info() important?",
+      "options": [
+        "A. It checks data structure and missing values",
+        "B. It creates charts",
+        "C. It deletes duplicates",
+        "D. It sorts data automatically"
+      ],
+      "answer": "A",
+      "explanation": "info() provides a concise summary of the DataFrame, including the number of non-null values and data types of each column."
+    },
+    {
+      "id": 21,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Why is using a line chart for gender or faculty misleading?",
+      "options": [
+        "A. Categorical data has no continuous progression",
+        "B. Line charts are only for maps",
+        "C. Gender is numerical",
+        "D. Faculty is continuous"
+      ],
+      "answer": "A",
+      "explanation": "Line charts imply a continuous connection or time-based flow between points; categorical labels like 'Gender' are independent and do not have a natural sequence."
+    },
+    {
+      "id": 22,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Difference between Matplotlib and Seaborn.",
+      "options": [
+        "A. Both are identical",
+        "B. Matplotlib is low-level; Seaborn is high-level statistical visualization",
+        "C. Seaborn cannot plot charts",
+        "D. Matplotlib only works with SQL"
+      ],
+      "answer": "B",
+      "explanation": "Matplotlib provides basic building blocks, while Seaborn is built on top of it to make complex statistical plots easier with better defaults."
+    },
+    {
+      "id": 23,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Scatterplot points tightly clustered upward diagonally imply:",
+      "options": [
+        "A. Negative correlation",
+        "B. No relationship",
+        "C. Strong positive correlation",
+        "D. Outliers only"
+      ],
+      "answer": "C",
+      "explanation": "When 'y' increases as 'x' increases in a straight-line fashion, it indicates a strong positive correlation."
+    },
+    {
+      "id": 24,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Why is sns.pairplot() powerful?",
+      "options": [
+        "A. It creates all pairwise relationships automatically",
+        "B. It deletes columns",
+        "C. It only works with images",
+        "D. It creates dashboards"
+      ],
+      "answer": "A",
+      "explanation": "pairplot() creates a grid of scatterplots for every numeric variable against every other numeric variable in one command."
+    },
+    {
+      "id": 25,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Points outside whiskers in a boxplot represent:",
+      "options": [
+        "A. Labels",
+        "B. Correlation",
+        "C. Outliers",
+        "D. Missing values"
+      ],
+      "answer": "C",
+      "explanation": "In a boxplot, whiskers typically extend to 1.5 times the Interquartile Range; points beyond that are considered potential outliers."
+    },
+    {
+      "id": 26,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Best Seaborn plot for average salary comparison with confidence intervals.",
+      "options": [
+        "A. Histogram",
+        "B. Scatterplot",
+        "C. Barplot",
+        "D. Heatmap"
+      ],
+      "answer": "C",
+      "explanation": "Seaborn's barplot() automatically calculates the mean and shows a confidence interval (error bar) for each category."
+    },
+    {
+      "id": 27,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Why is plt.tight_layout() important?",
+      "options": [
+        "A. Prevents overlapping chart elements",
+        "B. Adds colors",
+        "C. Deletes labels",
+        "D. Removes axes"
+      ],
+      "answer": "A",
+      "explanation": "It automatically adjusts subplot parameters so that labels and titles don't overlap with the axes."
+    },
+    {
+      "id": 28,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Correlation of +0.95 means:",
+      "options": [
+        "A. Very weak negative relationship",
+        "B. Strong positive relationship",
+        "C. No relationship",
+        "D. Random distribution"
+      ],
+      "answer": "B",
+      "explanation": "A correlation coefficient close to +1.0 indicates a very strong positive linear relationship."
+    },
+    {
+      "id": 29,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Right-skewed histogram indicates:",
+      "options": [
+        "A. Long tail on the right side",
+        "B. Perfect symmetry",
+        "C. Negative-only values",
+        "D. No variation"
+      ],
+      "answer": "A",
+      "explanation": "In a right-skewed distribution, the tail on the right side of the histogram is longer or fatter than the left side."
+    },
+    {
+      "id": 30,
+      "section": "SECTION C — Matplotlib & Seaborn",
+      "question": "Too many colors affect:",
+      "options": [
+        "A. Cognitive load and readability negatively",
+        "B. Database speed only",
+        "C. Python syntax only",
+        "D. Storage capacity only"
+      ],
+      "answer": "A",
+      "explanation": "Using too many colors makes it harder for the brain to process information and distinguish between important categories."
+    },
+    {
+      "id": 31,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Best visualization strategy for telecom analysis?",
+      "options": [
+        "A. Only pie charts",
+        "B. Combination of line charts, bar charts, heatmaps, and scatterplots",
+        "C. Only histograms",
+        "D. Only tables"
+      ],
+      "answer": "B",
+      "explanation": "Telecom data involves trends, volumes, and correlations, requiring a mix of chart types for full analysis."
+    },
+    {
+      "id": 32,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Suitable charts for population growth, unemployment, and poverty levels.",
+      "options": [
+        "A. Pie charts only",
+        "B. Line charts, bar charts, choropleth maps",
+        "C. Histograms only",
+        "D. Treemaps only"
+      ],
+      "answer": "B",
+      "explanation": "Line charts show growth trends, bar charts compare levels, and choropleth maps show geographical distribution."
+    },
+    {
+      "id": 33,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Should correlation imply causation?",
+      "options": [
+        "A. Yes always",
+        "B. No, hidden variables may exist",
+        "C. Yes for heatmaps only",
+        "D. Only in Pandas"
+      ],
+      "answer": "B",
+      "explanation": "Just because two variables move together doesn't mean one causes the other (e.g., ice cream sales and sunburns both correlate with heat)."
+    },
+    {
+      "id": 34,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Beautiful dashboards can still fail because of:",
+      "options": [
+        "A. Poor labeling and misleading charts",
+        "B. Excessive storytelling",
+        "C. Too much accuracy",
+        "D. Fast computers"
+      ],
+      "answer": "A",
+      "explanation": "If the labels are unclear or the scales are manipulated to look better, the dashboard fails to provide honest value."
+    },
+    {
+      "id": 35,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "“Good visualization is not about beauty alone” means:",
+      "options": [
+        "A. Visualization must communicate meaning clearly",
+        "B. Charts should only be colorful",
+        "C. Beauty is more important than data",
+        "D. Data is unnecessary"
+      ],
+      "answer": "A",
+      "explanation": "The primary goal of data visualization is to convey information efficiently and accurately; aesthetic appeal is secondary."
+    },
+    {
+      "id": 36,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Why is scatterplot alone insufficient for stock data?",
+      "options": [
+        "A. Time progression is difficult to track",
+        "B. Scatterplots cannot display dots",
+        "C. Stocks are categorical",
+        "D. Scatterplots delete data"
+      ],
+      "answer": "A",
+      "explanation": "Stock data relies heavily on the sequence of events over time, which a standard scatterplot does not visualize clearly."
+    },
+    {
+      "id": 37,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Useful variables for identifying at-risk students.",
+      "options": [
+        "A. Study hours, attendance, scores, assignment completion",
+        "B. Shoe size only",
+        "C. Favorite color only",
+        "D. Student photos only"
+      ],
+      "answer": "A",
+      "explanation": "Academic and behavioral metrics are direct indicators of student success or risk."
+    },
+    {
+      "id": 38,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Why does color-blind accessibility matter?",
+      "options": [
+        "A. Some users cannot distinguish certain colors",
+        "B. Colors increase RAM",
+        "C. Dashboards become slower",
+        "D. It only affects printers"
+      ],
+      "answer": "A",
+      "explanation": "To ensure data is interpretable by all users, visualizations should avoid problematic color pairings like red/green."
+    },
+    {
+      "id": 39,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Best visualization for live dashboard updates.",
+      "options": [
+        "A. Static visualization",
+        "B. Interactive visualization",
+        "C. Printed table",
+        "D. PDF image"
+      ],
+      "answer": "B",
+      "explanation": "Interactive visualizations allow for real-time filtering and exploration of live data streams."
+    },
+    {
+      "id": 40,
+      "section": "SECTION D — Advanced Scenario Questions",
+      "question": "Visualization should differ because:",
+      "options": [
+        "A. Different audiences require different complexity levels",
+        "B. Everyone understands charts equally",
+        "C. Technical analysts dislike data",
+        "D. Public users prefer code"
+      ],
+      "answer": "A",
+      "explanation": "Executives might need high-level summaries (KPIs), while data scientists might need detailed distribution plots."
+    },
+    {
+      "id": 41,
+      "section": "SECTION E — Coding & Error Analysis",
+      "question": "What is wrong with this code: sns.pieplot(data=df, y='score')?",
+      "options": [
+        "A. Seaborn has no pieplot() function",
+        "B. score is numerical",
+        "C. pie charts need DataFrames",
+        "D. Nothing is wrong"
+      ],
+      "answer": "A",
+      "explanation": "Seaborn does not include a pie chart function; you must use Matplotlib's plt.pie() for this."
+    },
+    {
+      "id": 42,
+      "section": "SECTION E — Coding & Error Analysis",
+      "question": "Find the error: titanic = titanic['Age'].fillna(titanic['Age'].mean())",
+      "options": [
+        "A. titanic becomes a Series instead of DataFrame",
+        "B. fillna() deletes rows",
+        "C. mean() returns string",
+        "D. No error"
+      ],
+      "answer": "A",
+      "explanation": "By assigning the result of a single column operation back to the 'titanic' variable, you overwrite the entire DataFrame with just one Series."
+    },
+    {
+      "id": 43,
+      "section": "SECTION E — Coding & Error Analysis",
+      "question": "Why might this fail: df['age'].astype(int)?",
+      "options": [
+        "A. Missing values or invalid strings may exist",
+        "B. Integers are unsupported",
+        "C. DataFrame has rows",
+        "D. Python blocks conversion"
+      ],
+      "answer": "A",
+      "explanation": "Pandas cannot convert 'NaN' or non-numeric strings (like 'Unknown') into an integer type."
+    },
+    {
+      "id": 44,
+      "section": "SECTION E — Coding & Error Analysis",
+      "question": "Explain the output: df.groupby('department')['salary'].mean()",
+      "options": [
+        "A. Calculates average salary for each department",
+        "B. Removes salary column",
+        "C. Sorts alphabetically only",
+        "D. Creates scatterplot"
+      ],
+      "answer": "A",
+      "explanation": "This aggregates the data by department and computes the average of the salary column for each group."
+    },
+    {
+      "id": 45,
+      "section": "SECTION E — Coding & Error Analysis",
+      "question": "Why is plotting 100 categories in one bar chart poor practice?",
+      "options": [
+        "A. It reduces readability and interpretation",
+        "B. It improves simplicity",
+        "C. It increases accessibility",
+        "D. It improves grouping"
+      ],
+      "answer": "A",
+      "explanation": "Too many categories in a single chart lead to overcrowding and make it impossible to read the labels or compare values."
+    },
+    {
+      "id": 46,
+      "section": "SECTION F — Critical Thinking",
+      "question": "Can a visualization be technically correct but misleading?",
+      "options": [
+        "A. No",
+        "B. Yes, through poor scaling or selective data presentation",
+        "C. Only in Excel",
+        "D. Only with pie charts"
+      ],
+      "answer": "B",
+      "explanation": "By starting the y-axis above zero or cherry-picking certain dates, a chart can tell a very different story than the full dataset."
+    },
+    {
+      "id": 47,
+      "section": "SECTION F — Critical Thinking",
+      "question": "Why is storytelling important in data visualization?",
+      "options": [
+        "A. It gives context and meaning to data",
+        "B. It replaces analysis",
+        "C. It removes charts",
+        "D. It hides patterns"
+      ],
+      "answer": "A",
+      "explanation": "Storytelling helps the audience understand the significance of the findings and what actions should be taken based on the data."
+    },
+    {
+      "id": 48,
+      "section": "SECTION F — Critical Thinking",
+      "question": "When should exploratory visualization be used?",
+      "options": [
+        "A. During initial data investigation",
+        "B. Only after publishing reports",
+        "C. Only for decoration",
+        "D. Only in business"
+      ],
+      "answer": "A",
+      "explanation": "Exploratory visualization is for the analyst's benefit to understand distributions and relationships before presenting final results."
+    },
+    {
+      "id": 49,
+      "section": "SECTION F — Critical Thinking",
+      "question": "Poor labeling affects decision-making because:",
+      "options": [
+        "A. Users may misinterpret the data",
+        "B. Labels are decorative only",
+        "C. Charts become faster",
+        "D. It improves analysis"
+      ],
+      "answer": "A",
+      "explanation": "Without clear units and titles, users might assume the wrong scale or metric, leading to incorrect business decisions."
+    },
+    {
+      "id": 50,
+      "section": "SECTION F — Critical Thinking",
+      "question": "What is the correct relationship between cleaning, analysis, visualization, and insight?",
+      "options": [
+        "A. Cleaning → Analysis → Visualization → Insight",
+        "B. Visualization → Cleaning → Randomness",
+        "C. Analysis → Decoration → Insight",
+        "D. Insight → Cleaning only"
+      ],
+      "answer": "A",
+      "explanation": "Data must be cleaned before it can be analyzed; analysis is then visualized to communicate the final insights."
+    }
+  ]

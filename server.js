@@ -28,7 +28,7 @@ const DELAY_ALL_ANSWERED = 500;
 const DELAY_START_GAME = 500;
 
 const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'quizmaster2024';
+const ADMIN_PASSWORD = 'bin_aliyu@121';
 
 // ============================================
 // PERMANENT DATA STORAGE

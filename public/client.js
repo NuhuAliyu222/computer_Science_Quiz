@@ -106,7 +106,7 @@ function showGoldCorrectAnswer() {
   }
 }
 
-function renderQuestion(qData, timeLimit = 20) {
+function renderQuestion(qData, timeLimit = 30) {
   if (!gameActive) return;
   if (exitGameBtn) exitGameBtn.style.display = 'block';
   
@@ -404,7 +404,7 @@ socket.on('gameStarted', () => {
   if (timerDisplay) timerDisplay.classList.remove('hidden');
 });
 
-socket.on('nextQuestion', ({ questionData, timeLimit = 20 }) => {
+socket.on('nextQuestion', ({ questionData, timeLimit = 30 }) => {
   if (gameActive) renderQuestion(questionData, timeLimit);
 });
 

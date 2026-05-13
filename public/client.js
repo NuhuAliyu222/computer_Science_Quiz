@@ -129,7 +129,6 @@ function renderQuestion(qData, timeLimit = 30) {
     <div class="options-grid" id="optionsContainer">${optsHtml}</div>
     <div id="questionFeedback" class="feedback-toast" style="display: none;"></div>
     <div style="font-size: 0.7rem; text-align: center; margin-top: 10px; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: bold;">
-      🏆 Answer to move to next question! 🏆
     </div>
   `;
   
@@ -274,7 +273,7 @@ async function adminLogin() {
       await loadQuestionsForAdmin();
       adminPanelScreen.classList.remove('hidden');
     } else {
-      errorDiv.innerText = 'Invalid credentials. Use admin / quizmaster2024';
+      errorDiv.innerText = 'Invalid credentials.';
     }
   } catch (error) {
     errorDiv.innerText = 'Login failed';
@@ -447,7 +446,7 @@ socket.on('playerLeft', ({ playersCount }) => {
 socket.on('someoneAnswered', ({ totalAnswered, totalPlayers }) => {
   const toast = document.createElement('div');
   toast.className = 'feedback-toast';
-  toast.innerHTML = `📝 ${totalAnswered}/${totalPlayers} players answered`;
+ // toast.innerHTML = `📝 ${totalAnswered}/${totalPlayers} players answered`;
   gameDynamicArea.insertBefore(toast, gameDynamicArea.firstChild);
   setTimeout(() => toast.remove(), 2000);
 });

@@ -22,8 +22,9 @@ app.use(express.static('public'));
 // ============================================
 // CONFIGURATION
 // ============================================
-const DELAY_AFTER_ANSWER = 500;      // 0.5 seconds before next question
-const DELAY_TIME_UP = 800;           
+const DELAY_AFTER_ANSWER = 800;
+const DELAY_TIME_UP = 800;
+const DELAY_ALL_ANSWERED = 500;
 const DELAY_START_GAME = 500;
 
 const ADMIN_USERNAME = 'admin';
@@ -35,11 +36,13 @@ const ADMIN_PASSWORD = 'bin_aliyu@121';
 const DATA_DIR = path.join(__dirname, 'data');
 const QUESTIONS_FILE = path.join(DATA_DIR, 'questions.json');
 
+// Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   console.log('📁 Created data directory');
 }
 
+// Default questions (10 Computer Science questions)
 const DEFAULT_QUESTIONS = [
   {
     id: 1,
@@ -113,26 +116,32 @@ const DEFAULT_QUESTIONS = [
   }
 ];
 
+// Initialize questions file if it doesn't exist
 if (!fs.existsSync(QUESTIONS_FILE)) {
   fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(DEFAULT_QUESTIONS, null, 2));
-  console.log('✅ Created questions.json with default questions');
+  console.log('✅ Created questions.json with 10 default Computer Science questions');
 } else {
   console.log('📚 Loaded existing questions.json file');
 }
 
+// Load questions from file
 function loadQuestions() {
   try {
     const data = fs.readFileSync(QUESTIONS_FILE, 'utf8');
-    return JSON.parse(data);
+    const questions = JSON.parse(data);
+    console.log(`📚 Loaded ${questions.length} questions from permanent storage`);
+    return questions;
   } catch (error) {
     console.error('Error loading questions:', error);
     return DEFAULT_QUESTIONS;
   }
 }
 
+// Save questions to file
 function saveQuestions(questions) {
   try {
     fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questions, null, 2));
+    console.log(`💾 Saved ${questions.length} questions to permanent storage`);
     return true;
   } catch (error) {
     console.error('Error saving questions:', error);
@@ -144,8 +153,10 @@ function saveQuestions(questions) {
 // API ENDPOINTS
 // ============================================
 
+// Admin login
 app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
+  
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     res.json({ success: true, message: 'Login successful', token: 'admin-token-' + Date.now() });
   } else {
@@ -153,44 +164,71 @@ app.post('/api/admin/login', (req, res) => {
   }
 });
 
+// GET all questions
 app.get('/api/questions', (req, res) => {
-  res.json({ success: true, questions: loadQuestions() });
+  const questions = loadQuestions();
+  res.json({ success: true, questions: questions });
 });
 
+// POST - Add new question (PERMANENT SAVE)
 app.post('/api/questions', (req, res) => {
   try {
     const { question, options, answer } = req.body;
+    
     if (!question || !options || !Array.isArray(options) || options.length !== 4) {
       return res.status(400).json({ success: false, message: 'Invalid question data' });
     }
+    
     const questions = loadQuestions();
     const newId = questions.length > 0 ? Math.max(...questions.map(q => q.id)) + 1 : 1;
-    const newQuestion = { id: newId, question, options, answer, createdAt: new Date().toISOString() };
+    
+    const newQuestion = {
+      id: newId,
+      question: question,
+      options: options,
+      answer: answer,
+      createdAt: new Date().toISOString()
+    };
+    
     questions.push(newQuestion);
-    saveQuestions(questions);
-    res.json({ success: true, message: 'Question saved permanently!', question: newQuestion });
+    
+    if (saveQuestions(questions)) {
+      console.log(`➕ Admin added question: ID ${newId} - "${question.substring(0, 50)}..."`);
+      res.json({ success: true, message: 'Question saved permanently!', question: newQuestion });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to save question' });
+    }
   } catch (error) {
+    console.error('Error adding question:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
+// DELETE question (PERMANENT REMOVAL)
 app.delete('/api/questions/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const questions = loadQuestions();
     const filteredQuestions = questions.filter(q => q.id !== id);
+    
     if (filteredQuestions.length === questions.length) {
       return res.status(404).json({ success: false, message: 'Question not found' });
     }
-    saveQuestions(filteredQuestions);
-    res.json({ success: true, message: 'Question deleted permanently!' });
+    
+    if (saveQuestions(filteredQuestions)) {
+      console.log(`🗑️ Admin deleted question: ID ${id}`);
+      res.json({ success: true, message: 'Question deleted permanently!' });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to delete question' });
+    }
   } catch (error) {
+    console.error('Error deleting question:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
 // ============================================
-// GAME STATE MANAGEMENT - INDIVIDUAL PROGRESSION FIXED
+// GAME STATE MANAGEMENT
 // ============================================
 
 const rooms = new Map();
@@ -211,7 +249,12 @@ io.on('connection', (socket) => {
         players: new Map(),
         questions: loadQuestions(),
         gameActive: false,
-        hostId: null
+        currentQuestionIndex: 0,
+        answeredPlayers: new Set(),
+        hostId: null,
+        scores: new Map(),
+        timerInterval: null,
+        timeRemaining: 30
       });
     }
 
@@ -231,11 +274,7 @@ io.on('connection', (socket) => {
     room.players.set(socket.id, {
       id: socket.id,
       name: playerName,
-      score: 0,
-      currentQuestionIndex: 0,
-      answered: false,
-      timerInterval: null,
-      timeRemaining: 30
+      score: 0
     });
     
     if (isHost) {
@@ -244,25 +283,15 @@ io.on('connection', (socket) => {
 
     socket.join(roomId);
     
-    // Send current players list to the new player
-    const playersList = Array.from(room.players.values()).map(p => ({ 
-      name: p.name, 
-      score: p.score 
-    }));
-    
     socket.emit('roomJoined', {
       roomId,
       isHost,
-      playersList: playersList,
+      playersList: Array.from(room.players.values()).map(p => ({ name: p.name, score: p.score })),
       questions: room.questions
     });
 
-    // Broadcast updated player list to everyone in the room
-    io.to(roomId).emit('playersUpdate', { 
-      players: playersList,
-      playersCount: room.players.size
-    });
-    
+    // PRIVATE - Only notify that player count changed, not who joined
+    socket.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
     console.log(`${playerName} joined room ${roomId}`);
   });
 
@@ -283,146 +312,87 @@ io.on('connection', (socket) => {
     }
 
     room.gameActive = true;
+    room.currentQuestionIndex = 0;
+    room.answeredPlayers.clear();
+    room.timeRemaining = 30;
     
-    // Reset each player's progress individually
     for (let [playerId, player] of room.players.entries()) {
       player.score = 0;
-      player.currentQuestionIndex = 0;
-      player.answered = false;
-      player.timeRemaining = 30;
-      if (player.timerInterval) {
-        clearInterval(player.timerInterval);
-        player.timerInterval = null;
-      }
     }
 
     io.to(roomId).emit('gameStarted');
     
-    // Send first question to EACH PLAYER INDIVIDUALLY
     setTimeout(() => {
       if (room.gameActive && room.questions.length > 0) {
-        for (let [playerId, player] of room.players.entries()) {
-          sendQuestionToPlayer(playerId, room, player.currentQuestionIndex);
-        }
+        sendQuestionWithTimer(roomId, room);
       }
     }, DELAY_START_GAME);
   });
 
-  // FIXED: Send question to a specific player with proper timer handling
-  function sendQuestionToPlayer(playerId, room, questionIndex) {
-    const playerSocket = io.sockets.sockets.get(playerId);
-    if (!playerSocket) return;
-    
-    const player = room.players.get(playerId);
-    if (!player) return;
-    
-    // Check if game is still active
+  function sendQuestionWithTimer(roomId, room) {
     if (!room.gameActive) return;
     
-    if (questionIndex >= room.questions.length) {
-      // Player finished all questions
-      playerSocket.emit('gameComplete', { 
-        finalScore: player.score,
-        totalQuestions: room.questions.length
-      });
-      
-      // Check if all players finished
-      let allFinished = true;
-      for (let [pid, p] of room.players.entries()) {
-        if (p.currentQuestionIndex < room.questions.length) {
-          allFinished = false;
-          break;
-        }
-      }
-      
-      if (allFinished) {
-        endGame(room);
-      }
-      return;
-    }
+    const currentQuestion = room.questions[room.currentQuestionIndex];
+    room.answeredPlayers.clear();
+    room.timeRemaining = 30;
     
-    const currentQuestion = room.questions[questionIndex];
-    player.answered = false;
-    player.timeRemaining = 30;
-    
-    playerSocket.emit('nextQuestion', {
+    io.to(roomId).emit('nextQuestion', {
       questionData: currentQuestion,
-      qIndex: questionIndex,
+      qIndex: room.currentQuestionIndex,
       total: room.questions.length,
-      timeLimit: 30
+      timeLimit: room.timeRemaining
     });
     
-    // Clear existing timer
-    if (player.timerInterval) {
-      clearInterval(player.timerInterval);
-    }
+    if (room.timerInterval) clearInterval(room.timerInterval);
     
-    // Start individual timer for this player
-    player.timerInterval = setInterval(() => {
-      const currentPlayer = room.players.get(playerId);
-      if (!currentPlayer || !room.gameActive) {
-        if (currentPlayer && currentPlayer.timerInterval) {
-          clearInterval(currentPlayer.timerInterval);
-        }
+    room.timerInterval = setInterval(() => {
+      if (!room.gameActive) {
+        if (room.timerInterval) clearInterval(room.timerInterval);
         return;
       }
       
-      // Don't decrease timer if already answered
-      if (currentPlayer.answered) {
-        return;
-      }
+      room.timeRemaining--;
+      io.to(roomId).emit('timerUpdate', { timeRemaining: room.timeRemaining });
       
-      currentPlayer.timeRemaining--;
-      playerSocket.emit('timerUpdate', { timeRemaining: currentPlayer.timeRemaining });
-      
-      if (currentPlayer.timeRemaining <= 0) {
-        clearInterval(currentPlayer.timerInterval);
-        currentPlayer.timerInterval = null;
+      if (room.timeRemaining <= 0) {
+        clearInterval(room.timerInterval);
+        room.timerInterval = null;
         
-        if (!currentPlayer.answered) {
-          currentPlayer.answered = true;
-          const currentQ = room.questions[currentPlayer.currentQuestionIndex];
-          playerSocket.emit('timeUp', { 
-            message: "Time's up! Moving to next question...",
-            correctAnswer: currentQ.answer,
-            correctAnswerText: currentQ.options[currentQ.answer]
-          });
-          
-          // Auto-move to next question for this player
-          setTimeout(() => {
-            if (room.gameActive) {
-              currentPlayer.currentQuestionIndex++;
-              sendQuestionToPlayer(playerId, room, currentPlayer.currentQuestionIndex);
+        io.to(roomId).emit('timeUp', { 
+          message: "Time's up! Moving to next question...",
+          correctAnswer: room.questions[room.currentQuestionIndex].answer,
+          correctAnswerText: room.questions[room.currentQuestionIndex].options[room.questions[room.currentQuestionIndex].answer]
+        });
+        
+        setTimeout(() => {
+          if (room.gameActive) {
+            room.currentQuestionIndex++;
+            if (room.currentQuestionIndex < room.questions.length) {
+              sendQuestionWithTimer(roomId, room);
+            } else {
+              endGame(roomId, room);
             }
-          }, DELAY_TIME_UP);
-        }
+          }
+        }, DELAY_TIME_UP);
       }
     }, 1000);
   }
   
-  function endGame(room) {
+  function endGame(roomId, room) {
     room.gameActive = false;
+    if (room.timerInterval) clearInterval(room.timerInterval);
     
-    // Clear all timers
-    for (let [playerId, player] of room.players.entries()) {
-      if (player.timerInterval) {
-        clearInterval(player.timerInterval);
-        player.timerInterval = null;
-      }
-    }
-    
-    const allScores = Array.from(room.players.values()).map(p => ({ 
-      name: p.name, 
-      score: p.score 
+    const finalScores = Array.from(room.players.values()).map(p => ({
+      name: p.name,
+      score: p.score
     })).sort((a, b) => b.score - a.score);
     
-    io.to(room.id).emit('gameOver', { scores: allScores });
-    console.log(`Game ended in room ${room.id}`);
+    io.to(roomId).emit('gameOver', { scores: finalScores });
+    console.log(`Game ended in room ${roomId}`);
   }
 
-  // FIXED: submitAnswer with proper progression
   socket.on('submitAnswer', (data) => {
-    const { roomId, answerIndex, isCorrect } = data;
+    const { roomId, answerIndex, isCorrect, playerName } = data;
     
     if (!rooms.has(roomId)) return;
     const room = rooms.get(roomId);
@@ -431,28 +401,20 @@ io.on('connection', (socket) => {
     const player = room.players.get(socket.id);
     if (!player) return;
     
-    // Prevent multiple answers for same question
-    if (player.answered) {
+    if (room.answeredPlayers.has(socket.id)) {
       socket.emit('errorMessage', 'You already answered this question');
       return;
     }
     
-    // Mark as answered immediately
-    player.answered = true;
-    
-    // Clear individual timer
-    if (player.timerInterval) {
-      clearInterval(player.timerInterval);
-      player.timerInterval = null;
-    }
-    
-    // Update score if correct
     if (isCorrect) {
       player.score += 1;
       socket.emit('scoreUpdate', { score: player.score });
     }
     
-    const currentQ = room.questions[player.currentQuestionIndex];
+    room.answeredPlayers.add(socket.id);
+    
+    // PRIVATE FEEDBACK - Only the answering player sees result
+    const currentQ = room.questions[room.currentQuestionIndex];
     if (isCorrect) {
       socket.emit('answerFeedback', { 
         correct: true, 
@@ -467,38 +429,23 @@ io.on('connection', (socket) => {
       });
     }
     
-    // CRITICAL FIX: Move to next question after delay
-    setTimeout(() => {
-      if (room.gameActive) {
-        // Increment question index
-        player.currentQuestionIndex++;
-        
-        // Check if there are more questions
-        if (player.currentQuestionIndex < room.questions.length) {
-          // Send next question to this specific player
-          sendQuestionToPlayer(socket.id, room, player.currentQuestionIndex);
-        } else {
-          // Player finished all questions
-          socket.emit('gameComplete', { 
-            finalScore: player.score,
-            totalQuestions: room.questions.length
-          });
-          
-          // Check if all players finished
-          let allFinished = true;
-          for (let [pid, p] of room.players.entries()) {
-            if (p.currentQuestionIndex < room.questions.length) {
-              allFinished = false;
-              break;
-            }
-          }
-          
-          if (allFinished) {
-            endGame(room);
+    // NO BROADCASTING - Players cannot see each other's answers
+    // REMOVED: io.to(roomId).emit('someoneAnswered', ...)
+    
+    if (room.answeredPlayers.size === room.players.size) {
+      if (room.timerInterval) clearInterval(room.timerInterval);
+      
+      setTimeout(() => {
+        if (room.gameActive) {
+          room.currentQuestionIndex++;
+          if (room.currentQuestionIndex < room.questions.length) {
+            sendQuestionWithTimer(roomId, room);
+          } else {
+            endGame(roomId, room);
           }
         }
-      }
-    }, DELAY_AFTER_ANSWER);
+      }, DELAY_ALL_ANSWERED);
+    }
   });
 
   socket.on('exitGame', (data) => {
@@ -509,21 +456,14 @@ io.on('connection', (socket) => {
       const player = room.players.get(socket.id);
       
       if (player) {
-        if (player.timerInterval) clearInterval(player.timerInterval);
         room.players.delete(socket.id);
         socket.leave(roomId);
         
-        // Send updated player list to everyone
-        const playersList = Array.from(room.players.values()).map(p => ({ 
-          name: p.name, 
-          score: p.score 
-        }));
-        io.to(roomId).emit('playersUpdate', { 
-          players: playersList,
-          playersCount: room.players.size
-        });
+        // PRIVATE - Only update player count, no names
+        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
+          if (room.timerInterval) clearInterval(room.timerInterval);
           rooms.delete(roomId);
         } else if (socket.id === room.hostId && room.players.size > 0) {
           const newHostId = Array.from(room.players.keys())[0];
@@ -531,6 +471,7 @@ io.on('connection', (socket) => {
           const newHost = room.players.get(newHostId);
           io.to(roomId).emit('newHost', { newHostName: newHost.name });
         }
+        
         socket.emit('exitConfirmed', { message: 'You have left the game' });
       }
     }
@@ -544,21 +485,14 @@ io.on('connection', (socket) => {
       const player = room.players.get(socket.id);
       
       if (player) {
-        if (player.timerInterval) clearInterval(player.timerInterval);
         room.players.delete(socket.id);
         socket.leave(roomId);
         
-        // Send updated player list to everyone
-        const playersList = Array.from(room.players.values()).map(p => ({ 
-          name: p.name, 
-          score: p.score 
-        }));
-        io.to(roomId).emit('playersUpdate', { 
-          players: playersList,
-          playersCount: room.players.size
-        });
+        // PRIVATE - Only update player count, no names
+        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
+          if (room.timerInterval) clearInterval(room.timerInterval);
           rooms.delete(roomId);
         } else if (socket.id === room.hostId && room.players.size > 0) {
           const newHostId = Array.from(room.players.keys())[0];
@@ -568,6 +502,7 @@ io.on('connection', (socket) => {
         }
       }
     }
+    
     socket.emit('leftRoom');
   });
 
@@ -577,20 +512,13 @@ io.on('connection', (socket) => {
     for (const [roomId, room] of rooms.entries()) {
       if (room.players.has(socket.id)) {
         const player = room.players.get(socket.id);
-        if (player.timerInterval) clearInterval(player.timerInterval);
         room.players.delete(socket.id);
         
-        // Send updated player list to everyone
-        const playersList = Array.from(room.players.values()).map(p => ({ 
-          name: p.name, 
-          score: p.score 
-        }));
-        io.to(roomId).emit('playersUpdate', { 
-          players: playersList,
-          playersCount: room.players.size
-        });
+        // PRIVATE - Only update player count, no names
+        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
+          if (room.timerInterval) clearInterval(room.timerInterval);
           rooms.delete(roomId);
         } else if (socket.id === room.hostId) {
           const newHostId = Array.from(room.players.keys())[0];
@@ -615,9 +543,8 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`${'='.repeat(60)}`);
   console.log(`📍 URL: http://localhost:${PORT}`);
   console.log(`💾 Permanent storage: ${QUESTIONS_FILE}`);
-  console.log(`⚡ INDIVIDUAL PROGRESSION: Each player moves at their own pace`);
-  console.log(`🔒 FULL PRIVACY MODE: Players cannot see each other's answers`);
-  console.log(`✅ FIXED: Game continues properly after each answer`);
+  console.log(`📚 Default questions: 10 Computer Science questions`);
+  console.log(`🔒 FULL PRIVACY MODE: Players CANNOT see each other's answers`);
   console.log(`🚪 Exit button: Available during gameplay`);
   console.log(`\n🔐 Admin Login: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}`);
   console.log(`${'='.repeat(60)}\n`);

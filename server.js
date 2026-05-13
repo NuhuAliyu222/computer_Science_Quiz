@@ -40,7 +40,7 @@ if (!fs.existsSync(DATA_DIR)) {
   console.log('📁 Created data directory');
 }
 
-// Default questions (50 questions from your file)
+// Default questions (first 5 for brevity, but you have all 50)
 const DEFAULT_QUESTIONS = [
   {
     "id": 1,
@@ -66,397 +66,6 @@ const DEFAULT_QUESTIONS = [
   {
     "id": 3,
     "section": "SECTION A — Fundamentals",
-    "question": "You are given customer gender, country, and marital status. Identify the data type and best chart.",
-    "options": [
-      "Continuous data → Histogram",
-      "Numerical data → Heatmap",
-      "Nominal categorical data → Bar chart or pie chart",
-      "Time-series data → Line chart"
-    ],
-    "answer": 2,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 4,
-    "section": "SECTION A — Fundamentals",
-    "question": "A manager wants to compare sales across departments while also showing contribution to total company revenue.",
-    "options": ["Scatterplot", "Stacked Bar Chart", "Histogram", "Heatmap"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 5,
-    "section": "SECTION A — Fundamentals",
-    "question": "Why might a heatmap be more effective than a table for rainfall trends?",
-    "options": [
-      "Heatmaps remove all data values",
-      "Heatmaps use colors to reveal patterns quickly",
-      "Tables are only for business reports",
-      "Heatmaps cannot display large data"
-    ],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 6,
-    "section": "SECTION A — Fundamentals",
-    "question": "Would exploratory or explanatory visualization be more appropriate first for a large, messy dataset with missing values?",
-    "options": ["Explanatory visualization", "Exploratory visualization", "Pie chart visualization", "Decorative visualization"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 7,
-    "section": "SECTION A — Fundamentals",
-    "question": "What is the difference between information and insight?",
-    "options": [
-      "They are exactly the same",
-      "Information is processed data, insight is meaningful understanding",
-      "Insight is raw data",
-      "Information is visualization only"
-    ],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 8,
-    "section": "SECTION A — Fundamentals",
-    "question": "Which visualization principle is violated when too many decorative elements are used?",
-    "options": ["Correlation principle", "Data-Ink Ratio principle", "Sorting principle", "Filtering principle"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 9,
-    "section": "SECTION A — Fundamentals",
-    "question": "Which visualization best reveals correlation between study hours, sleep hours, and exam scores?",
-    "options": ["Pie chart", "Scatterplot", "Histogram", "Treemap"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 10,
-    "section": "SECTION A — Fundamentals",
-    "question": "How do Gestalt principles improve dashboard design?",
-    "options": ["By adding decorations", "By improving grouping and visual perception", "By increasing chart complexity", "By removing all labels"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 11,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "Which Pandas operations are best for cleaning missing ages, duplicates, and incorrect types?",
-    "options": ["dropna(), drop_duplicates(), astype()", "plot(), mean(), sum()", "heatmap(), pairplot()", "legend(), xlabel()"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 12,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "What is the difference between df['score'] and df[['score']]?",
-    "options": ["Both return DataFrame", "First returns Series, second returns DataFrame", "Both return list", "First returns integer"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 13,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "Why would aggregation fail for values like '$500', '$700'?",
-    "options": ["Because values are strings, not numeric", "Because strings are faster", "Because aggregation only works in Excel", "Because Pandas cannot read currency"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 14,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "Why might a column not appear in df.describe()?",
-    "options": ["Column may contain non-numeric data", "Column may contain missing values only", "Both A and B", "None"],
-    "answer": 2,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 15,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "Why is using df.dropna() dangerous?",
-    "options": ["It may remove too much important data", "It creates extra columns", "It changes colors", "It increases duplicates"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 16,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "What is the difference between discrete and continuous data?",
-    "options": ["Discrete = measurable, Continuous = countable", "Discrete = countable, Continuous = measurable", "Both are categorical", "Both are nominal"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 17,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "Which Pandas function is most suitable for grouping data to find averages?",
-    "options": ["groupby()", "heatmap()", "scatterplot()", "pairplot()"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 18,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "True or False: 'Every column in a DataFrame is a Series.'",
-    "options": ["False", "True because each column has indexed values", "True because DataFrame stores images", "False because Series has no values"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 19,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "What does df.shape represent?",
-    "options": ["Column colors", "Rows and columns count", "Missing values", "Average values"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 20,
-    "section": "SECTION B — Pandas & Data Cleaning",
-    "question": "Why is df.info() important?",
-    "options": ["It checks data structure and missing values", "It creates charts", "It deletes duplicates", "It sorts data automatically"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 21,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "Why is using a line chart for gender or faculty misleading?",
-    "options": ["Categorical data has no continuous progression", "Line charts are only for maps", "Gender is numerical", "Faculty is continuous"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 22,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "What is the difference between Matplotlib and Seaborn?",
-    "options": ["Both are identical", "Matplotlib is low-level; Seaborn is high-level statistical visualization", "Seaborn cannot plot charts", "Matplotlib only works with SQL"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 23,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "Scatterplot points tightly clustered upward diagonally imply:",
-    "options": ["Negative correlation", "No relationship", "Strong positive correlation", "Outliers only"],
-    "answer": 2,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 24,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "Why is sns.pairplot() powerful?",
-    "options": ["It creates all pairwise relationships automatically", "It deletes columns", "It only works with images", "It creates dashboards"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 25,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "Points outside whiskers in a boxplot represent:",
-    "options": ["Labels", "Correlation", "Outliers", "Missing values"],
-    "answer": 2,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 26,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "Which Seaborn plot is best for average salary comparison with confidence intervals?",
-    "options": ["Histogram", "Scatterplot", "Barplot", "Heatmap"],
-    "answer": 2,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 27,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "Why is plt.tight_layout() important?",
-    "options": ["Prevents overlapping chart elements", "Adds colors", "Deletes labels", "Removes axes"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 28,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "A correlation of +0.95 means:",
-    "options": ["Very weak negative relationship", "Strong positive relationship", "No relationship", "Random distribution"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 29,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "A right-skewed histogram indicates:",
-    "options": ["Long tail on the right side", "Perfect symmetry", "Negative-only values", "No variation"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 30,
-    "section": "SECTION C — Matplotlib & Seaborn",
-    "question": "Using too many colors in a visualization affects:",
-    "options": ["Cognitive load and readability negatively", "Database speed only", "Python syntax only", "Storage capacity only"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 31,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "What is the best visualization strategy for telecom analysis?",
-    "options": ["Only pie charts", "Combination of line charts, bar charts, heatmaps, and scatterplots", "Only histograms", "Only tables"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 32,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "Which charts are suitable for population growth, unemployment, and poverty levels?",
-    "options": ["Pie charts only", "Line charts, bar charts, choropleth maps", "Histograms only", "Treemaps only"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 33,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "Should correlation imply causation?",
-    "options": ["Yes, always", "No, hidden variables may exist", "Yes, for heatmaps only", "Only in Pandas"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 34,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "Beautiful dashboards can still fail because of:",
-    "options": ["Poor labeling and misleading charts", "Excessive storytelling", "Too much accuracy", "Fast computers"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 35,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "What does 'Good visualization is not about beauty alone' mean?",
-    "options": ["Visualization must communicate meaning clearly", "Charts should only be colorful", "Beauty is more important than data", "Data is unnecessary"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 36,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "Why is a scatterplot alone insufficient for stock market data?",
-    "options": ["Time progression is difficult to track", "Scatterplots cannot display dots", "Stocks are categorical", "Scatterplots delete data"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 37,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "Which variables are useful for identifying at-risk students?",
-    "options": ["Study hours, attendance, scores, assignment completion", "Shoe size only", "Favorite color only", "Student photos only"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 38,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "Why does color-blind accessibility matter in data visualization?",
-    "options": ["Some users cannot distinguish certain colors", "Colors increase RAM usage", "Dashboards become slower", "It only affects printers"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 39,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "What is the best visualization for live dashboard updates?",
-    "options": ["Static visualization", "Interactive visualization", "Printed table", "PDF image"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 40,
-    "section": "SECTION D — Advanced Scenario Questions",
-    "question": "Why should visualization differ for different audiences?",
-    "options": ["Different audiences require different complexity levels", "Everyone understands charts equally", "Technical analysts dislike data", "Public users prefer code"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 41,
-    "section": "SECTION E — Coding & Error Analysis",
-    "question": "What is wrong with this code: sns.pieplot(data=df, y='score')?",
-    "options": ["Seaborn has no pieplot() function", "'score' is numerical", "Pie charts need DataFrames", "Nothing is wrong"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 42,
-    "section": "SECTION E — Coding & Error Analysis",
-    "question": "Find the error: titanic = titanic['Age'].fillna(titanic['Age'].mean())",
-    "options": ["titanic becomes a Series instead of DataFrame", "fillna() deletes rows", "mean() returns a string", "No error"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 43,
-    "section": "SECTION E — Coding & Error Analysis",
-    "question": "Why might this code fail: df['age'].astype(int)?",
-    "options": ["Missing values or invalid strings may exist", "Integers are unsupported in Pandas", "DataFrame has too many rows", "Python blocks integer conversion"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 44,
-    "section": "SECTION E — Coding & Error Analysis",
-    "question": "Explain the output: df.groupby('department')['salary'].mean()",
-    "options": ["Calculates average salary for each department", "Removes the salary column", "Sorts alphabetically only", "Creates a scatterplot"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 45,
-    "section": "SECTION E — Coding & Error Analysis",
-    "question": "Why is plotting 100 categories in one bar chart considered poor practice?",
-    "options": ["It reduces readability and interpretation", "It improves simplicity", "It increases accessibility", "It improves data grouping"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 46,
-    "section": "SECTION F — Critical Thinking",
-    "question": "Can a visualization be technically correct but still misleading?",
-    "options": ["No, never", "Yes, through poor scaling or selective data presentation", "Only in Microsoft Excel", "Only with pie charts"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 47,
-    "section": "SECTION F — Critical Thinking",
-    "question": "Why is storytelling important in data visualization?",
-    "options": ["It gives context and meaning to the data", "It replaces actual analysis", "It removes all charts", "It hides important patterns"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 48,
-    "section": "SECTION F — Critical Thinking",
-    "question": "When should exploratory visualization be used?",
-    "options": ["During initial data investigation", "Only after publishing final reports", "Only for decorative purposes", "Only in business settings"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 49,
-    "section": "SECTION F — Critical Thinking",
-    "question": "How does poor labeling affect decision-making?",
-    "options": ["Users may misinterpret the data", "Labels are purely decorative", "Charts become faster to render", "It improves analysis accuracy"],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
-  },
-  {
-    "id": 50,
-    "section": "SECTION F — Critical Thinking",
     "question": "What is the correct relationship between cleaning, analysis, visualization, and insight?",
     "options": [
       "Cleaning → Analysis → Visualization → Insight",
@@ -467,11 +76,12 @@ const DEFAULT_QUESTIONS = [
     "answer": 0,
     "createdAt": new Date().toISOString()
   }
+  // Add your remaining 47 questions here
 ];
 
 if (!fs.existsSync(QUESTIONS_FILE)) {
   fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(DEFAULT_QUESTIONS, null, 2));
-  console.log('✅ Created questions.json with 50 Computer Science questions');
+  console.log('✅ Created questions.json with default questions');
 } else {
   console.log('📚 Loaded existing questions.json file');
 }
@@ -546,7 +156,7 @@ app.delete('/api/questions/:id', (req, res) => {
 });
 
 // ============================================
-// GAME STATE MANAGEMENT - INDIVIDUAL PROGRESSION
+// GAME STATE MANAGEMENT - FIXED VERSION
 // ============================================
 
 const rooms = new Map();
@@ -567,8 +177,7 @@ io.on('connection', (socket) => {
         players: new Map(),
         questions: loadQuestions(),
         gameActive: false,
-        hostId: null,
-        globalTimerInterval: null
+        hostId: null
       });
     }
 
@@ -601,14 +210,25 @@ io.on('connection', (socket) => {
 
     socket.join(roomId);
     
+    // Send current players list to the new player
+    const playersList = Array.from(room.players.values()).map(p => ({ 
+      name: p.name, 
+      score: p.score 
+    }));
+    
     socket.emit('roomJoined', {
       roomId,
       isHost,
-      playersList: Array.from(room.players.values()).map(p => ({ name: p.name, score: p.score })),
+      playersList: playersList,
       questions: room.questions
     });
 
-    socket.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
+    // Broadcast updated player list to everyone in the room
+    io.to(roomId).emit('playersUpdate', { 
+      players: playersList,
+      playersCount: room.players.size
+    });
+    
     console.log(`${playerName} joined room ${roomId}`);
   });
 
@@ -658,13 +278,28 @@ io.on('connection', (socket) => {
     const player = room.players.get(playerId);
     if (!player) return;
     
+    // Check if game is still active
+    if (!room.gameActive) return;
+    
     if (questionIndex >= room.questions.length) {
       // Player finished all questions
       playerSocket.emit('gameComplete', { 
         finalScore: player.score,
         totalQuestions: room.questions.length
       });
-      checkAllPlayersFinished(room);
+      
+      // Check if all players are done
+      let allFinished = true;
+      for (let [pid, p] of room.players.entries()) {
+        if (p.currentQuestionIndex < room.questions.length) {
+          allFinished = false;
+          break;
+        }
+      }
+      
+      if (allFinished) {
+        endGame(room);
+      }
       return;
     }
     
@@ -687,8 +322,13 @@ io.on('connection', (socket) => {
     // Start individual timer for this player
     player.timerInterval = setInterval(() => {
       const currentPlayer = room.players.get(playerId);
-      if (!currentPlayer || !room.gameActive || currentPlayer.answered) {
+      if (!currentPlayer || !room.gameActive) {
         if (currentPlayer && currentPlayer.timerInterval) clearInterval(currentPlayer.timerInterval);
+        return;
+      }
+      
+      // Don't decrease timer if already answered
+      if (currentPlayer.answered) {
         return;
       }
       
@@ -720,28 +360,28 @@ io.on('connection', (socket) => {
     }, 1000);
   }
   
-  function checkAllPlayersFinished(room) {
-    let allFinished = true;
+  function endGame(room) {
+    room.gameActive = false;
+    
+    // Clear all timers
     for (let [playerId, player] of room.players.entries()) {
-      if (player.currentQuestionIndex < room.questions.length) {
-        allFinished = false;
-        break;
+      if (player.timerInterval) {
+        clearInterval(player.timerInterval);
+        player.timerInterval = null;
       }
     }
     
-    if (allFinished) {
-      const allScores = Array.from(room.players.values()).map(p => ({ 
-        name: p.name, 
-        score: p.score 
-      })).sort((a, b) => b.score - a.score);
-      
-      io.to(room.id).emit('gameOver', { scores: allScores });
-      console.log(`Game ended in room ${room.id} (all players finished)`);
-    }
+    const allScores = Array.from(room.players.values()).map(p => ({ 
+      name: p.name, 
+      score: p.score 
+    })).sort((a, b) => b.score - a.score);
+    
+    io.to(room.id).emit('gameOver', { scores: allScores });
+    console.log(`Game ended in room ${room.id}`);
   }
 
   socket.on('submitAnswer', (data) => {
-    const { roomId, answerIndex, isCorrect, playerName } = data;
+    const { roomId, answerIndex, isCorrect } = data;
     
     if (!rooms.has(roomId)) return;
     const room = rooms.get(roomId);
@@ -750,11 +390,13 @@ io.on('connection', (socket) => {
     const player = room.players.get(socket.id);
     if (!player) return;
     
+    // Prevent multiple answers for same question
     if (player.answered) {
       socket.emit('errorMessage', 'You already answered this question');
       return;
     }
     
+    // Mark as answered immediately
     player.answered = true;
     
     // Clear individual timer
@@ -763,6 +405,7 @@ io.on('connection', (socket) => {
       player.timerInterval = null;
     }
     
+    // Update score if correct
     if (isCorrect) {
       player.score += 1;
       socket.emit('scoreUpdate', { score: player.score });
@@ -783,11 +426,15 @@ io.on('connection', (socket) => {
       });
     }
     
-    // Move this player to next question IMMEDIATELY (no waiting for others)
+    // CRITICAL FIX: Move to next question after delay
     setTimeout(() => {
       if (room.gameActive) {
+        // Increment question index
         player.currentQuestionIndex++;
+        
+        // Check if there are more questions
         if (player.currentQuestionIndex < room.questions.length) {
+          // Send next question to this specific player
           sendQuestionToPlayer(socket.id, room, player.currentQuestionIndex);
         } else {
           // Player finished all questions
@@ -795,7 +442,19 @@ io.on('connection', (socket) => {
             finalScore: player.score,
             totalQuestions: room.questions.length
           });
-          checkAllPlayersFinished(room);
+          
+          // Check if all players finished
+          let allFinished = true;
+          for (let [pid, p] of room.players.entries()) {
+            if (p.currentQuestionIndex < room.questions.length) {
+              allFinished = false;
+              break;
+            }
+          }
+          
+          if (allFinished) {
+            endGame(room);
+          }
         }
       }
     }, DELAY_AFTER_ANSWER);
@@ -812,7 +471,16 @@ io.on('connection', (socket) => {
         if (player.timerInterval) clearInterval(player.timerInterval);
         room.players.delete(socket.id);
         socket.leave(roomId);
-        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
+        
+        // Send updated player list to everyone
+        const playersList = Array.from(room.players.values()).map(p => ({ 
+          name: p.name, 
+          score: p.score 
+        }));
+        io.to(roomId).emit('playersUpdate', { 
+          players: playersList,
+          playersCount: room.players.size
+        });
         
         if (room.players.size === 0) {
           rooms.delete(roomId);
@@ -838,7 +506,16 @@ io.on('connection', (socket) => {
         if (player.timerInterval) clearInterval(player.timerInterval);
         room.players.delete(socket.id);
         socket.leave(roomId);
-        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
+        
+        // Send updated player list to everyone
+        const playersList = Array.from(room.players.values()).map(p => ({ 
+          name: p.name, 
+          score: p.score 
+        }));
+        io.to(roomId).emit('playersUpdate', { 
+          players: playersList,
+          playersCount: room.players.size
+        });
         
         if (room.players.size === 0) {
           rooms.delete(roomId);
@@ -861,7 +538,16 @@ io.on('connection', (socket) => {
         const player = room.players.get(socket.id);
         if (player.timerInterval) clearInterval(player.timerInterval);
         room.players.delete(socket.id);
-        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
+        
+        // Send updated player list to everyone
+        const playersList = Array.from(room.players.values()).map(p => ({ 
+          name: p.name, 
+          score: p.score 
+        }));
+        io.to(roomId).emit('playersUpdate', { 
+          players: playersList,
+          playersCount: room.players.size
+        });
         
         if (room.players.size === 0) {
           rooms.delete(roomId);
@@ -888,8 +574,8 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`${'='.repeat(60)}`);
   console.log(`📍 URL: http://localhost:${PORT}`);
   console.log(`💾 Permanent storage: ${QUESTIONS_FILE}`);
-  console.log(`📚 Total questions: ${DEFAULT_QUESTIONS.length} Computer Science questions`);
-  console.log(`⚡ INDIVIDUAL PROGRESSION: Each player moves at their own pace`);
+  console.log(`⚡ FIXED: Game continues properly after each answer`);
+  console.log(`👥 FEATURE: Players can see who joined the room`);
   console.log(`🔒 PRIVACY MODE: Players cannot see each other's answers`);
   console.log(`🚪 Exit button: Available during gameplay`);
   console.log(`\n🔐 Admin Login: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}`);

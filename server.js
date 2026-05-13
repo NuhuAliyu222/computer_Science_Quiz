@@ -22,7 +22,7 @@ app.use(express.static('public'));
 // ============================================
 // CONFIGURATION
 // ============================================
-const DELAY_AFTER_ANSWER = 800;      // 0.8 seconds before next question
+const DELAY_AFTER_ANSWER = 500;      // 0.5 seconds before next question
 const DELAY_TIME_UP = 800;           
 const DELAY_START_GAME = 500;
 
@@ -40,43 +40,77 @@ if (!fs.existsSync(DATA_DIR)) {
   console.log('📁 Created data directory');
 }
 
-// Default questions (first 5 for brevity, but you have all 50)
 const DEFAULT_QUESTIONS = [
   {
-    "id": 1,
-    "section": "SECTION A — Fundamentals",
-    "question": "A company wants to show yearly profit trends, seasonal patterns, and sudden drops in revenue. Which visualization is MOST appropriate and why?",
-    "options": ["Pie Chart", "Line Chart", "Histogram", "Boxplot"],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
+    id: 1,
+    question: "What does CPU stand for?",
+    options: ["Central Processing Unit", "Computer Personal Unit", "Central Program Utility", "Core Processing Utility"],
+    answer: 0,
+    createdAt: new Date().toISOString()
   },
   {
-    "id": 2,
-    "section": "SECTION A — Fundamentals",
-    "question": "A hospital dashboard uses pie charts to compare patient ages, treatment costs, and survival rates. Explain why this is a poor visualization choice and recommend better alternatives.",
-    "options": [
-      "Pie charts are only for geographical data",
-      "Pie charts cannot effectively compare continuous numerical values",
-      "Pie charts only work for stock prices",
-      "Pie charts are used only in Seaborn"
-    ],
-    "answer": 1,
-    "createdAt": new Date().toISOString()
+    id: 2,
+    question: "Which data structure uses LIFO (Last In First Out)?",
+    options: ["Queue", "Array", "Stack", "Linked List"],
+    answer: 2,
+    createdAt: new Date().toISOString()
   },
   {
-    "id": 3,
-    "section": "SECTION A — Fundamentals",
-    "question": "What is the correct relationship between cleaning, analysis, visualization, and insight?",
-    "options": [
-      "Cleaning → Analysis → Visualization → Insight",
-      "Visualization → Cleaning → Randomness → Insight",
-      "Analysis → Decoration → Visualization → Insight",
-      "Insight → Cleaning → Analysis → Visualization"
-    ],
-    "answer": 0,
-    "createdAt": new Date().toISOString()
+    id: 3,
+    question: "What does HTTP stand for?",
+    options: ["HyperText Transfer Protocol", "High Transfer Text Protocol", "Hyper Transfer Text Protocol", "HyperText Transmission Program"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 4,
+    question: "Which of these is a JavaScript framework?",
+    options: ["Django", "Flask", "React", "Laravel"],
+    answer: 2,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 5,
+    question: "What is the time complexity of binary search?",
+    options: ["O(n)", "O(log n)", "O(n²)", "O(1)"],
+    answer: 1,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 6,
+    question: "What does SQL stand for?",
+    options: ["Structured Query Language", "Simple Query Language", "Structured Question Language", "System Query Language"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 7,
+    question: "Which programming language is primarily used for Android development?",
+    options: ["Swift", "Kotlin/Java", "C#", "Python"],
+    answer: 1,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 8,
+    question: "What is the main purpose of Git?",
+    options: ["Version Control", "Web Development", "Database Management", "Game Development"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 9,
+    question: "What does RAM stand for?",
+    options: ["Random Access Memory", "Read Access Memory", "Rapid Access Memory", "Readily Available Memory"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 10,
+    question: "Which company created the Java programming language?",
+    options: ["Microsoft", "Apple", "Sun Microsystems", "IBM"],
+    answer: 2,
+    createdAt: new Date().toISOString()
   }
-  // Add your remaining 47 questions here
 ];
 
 if (!fs.existsSync(QUESTIONS_FILE)) {
@@ -156,7 +190,7 @@ app.delete('/api/questions/:id', (req, res) => {
 });
 
 // ============================================
-// GAME STATE MANAGEMENT - FIXED VERSION
+// GAME STATE MANAGEMENT - INDIVIDUAL PROGRESSION FIXED
 // ============================================
 
 const rooms = new Map();
@@ -255,7 +289,11 @@ io.on('connection', (socket) => {
       player.score = 0;
       player.currentQuestionIndex = 0;
       player.answered = false;
-      if (player.timerInterval) clearInterval(player.timerInterval);
+      player.timeRemaining = 30;
+      if (player.timerInterval) {
+        clearInterval(player.timerInterval);
+        player.timerInterval = null;
+      }
     }
 
     io.to(roomId).emit('gameStarted');
@@ -270,7 +308,7 @@ io.on('connection', (socket) => {
     }, DELAY_START_GAME);
   });
 
-  // Send question to a specific player (individual progression)
+  // FIXED: Send question to a specific player with proper timer handling
   function sendQuestionToPlayer(playerId, room, questionIndex) {
     const playerSocket = io.sockets.sockets.get(playerId);
     if (!playerSocket) return;
@@ -288,7 +326,7 @@ io.on('connection', (socket) => {
         totalQuestions: room.questions.length
       });
       
-      // Check if all players are done
+      // Check if all players finished
       let allFinished = true;
       for (let [pid, p] of room.players.entries()) {
         if (p.currentQuestionIndex < room.questions.length) {
@@ -323,7 +361,9 @@ io.on('connection', (socket) => {
     player.timerInterval = setInterval(() => {
       const currentPlayer = room.players.get(playerId);
       if (!currentPlayer || !room.gameActive) {
-        if (currentPlayer && currentPlayer.timerInterval) clearInterval(currentPlayer.timerInterval);
+        if (currentPlayer && currentPlayer.timerInterval) {
+          clearInterval(currentPlayer.timerInterval);
+        }
         return;
       }
       
@@ -380,6 +420,7 @@ io.on('connection', (socket) => {
     console.log(`Game ended in room ${room.id}`);
   }
 
+  // FIXED: submitAnswer with proper progression
   socket.on('submitAnswer', (data) => {
     const { roomId, answerIndex, isCorrect } = data;
     
@@ -574,9 +615,9 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`${'='.repeat(60)}`);
   console.log(`📍 URL: http://localhost:${PORT}`);
   console.log(`💾 Permanent storage: ${QUESTIONS_FILE}`);
-  console.log(`⚡ FIXED: Game continues properly after each answer`);
-  console.log(`👥 FEATURE: Players can see who joined the room`);
-  console.log(`🔒 PRIVACY MODE: Players cannot see each other's answers`);
+  console.log(`⚡ INDIVIDUAL PROGRESSION: Each player moves at their own pace`);
+  console.log(`🔒 FULL PRIVACY MODE: Players cannot see each other's answers`);
+  console.log(`✅ FIXED: Game continues properly after each answer`);
   console.log(`🚪 Exit button: Available during gameplay`);
   console.log(`\n🔐 Admin Login: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}`);
   console.log(`${'='.repeat(60)}\n`);

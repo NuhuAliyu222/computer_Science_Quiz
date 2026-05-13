@@ -14,72 +14,174 @@ const io = socketIo(server, {
   }
 });
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // ============================================
-// DELAY CONFIGURATION - NORMAL SPEED
+// CONFIGURATION
 // ============================================
 const DELAY_AFTER_ANSWER = 800;
 const DELAY_TIME_UP = 800;
 const DELAY_ALL_ANSWERED = 500;
 const DELAY_START_GAME = 500;
 
-// Admin credentials
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'quizmaster2024';
 
-// Admin login endpoint
+// ============================================
+// PERMANENT DATA STORAGE
+// ============================================
+const DATA_DIR = path.join(__dirname, 'data');
+const QUESTIONS_FILE = path.join(DATA_DIR, 'questions.json');
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  console.log('📁 Created data directory');
+}
+
+// Default questions (10 Computer Science questions)
+const DEFAULT_QUESTIONS = [
+  {
+    id: 1,
+    question: "What does CPU stand for?",
+    options: ["Central Processing Unit", "Computer Personal Unit", "Central Program Utility", "Core Processing Utility"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 2,
+    question: "Which data structure uses LIFO (Last In First Out)?",
+    options: ["Queue", "Array", "Stack", "Linked List"],
+    answer: 2,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 3,
+    question: "What does HTTP stand for?",
+    options: ["HyperText Transfer Protocol", "High Transfer Text Protocol", "Hyper Transfer Text Protocol", "HyperText Transmission Program"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 4,
+    question: "Which of these is a JavaScript framework?",
+    options: ["Django", "Flask", "React", "Laravel"],
+    answer: 2,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 5,
+    question: "What is the time complexity of binary search?",
+    options: ["O(n)", "O(log n)", "O(n²)", "O(1)"],
+    answer: 1,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 6,
+    question: "What does SQL stand for?",
+    options: ["Structured Query Language", "Simple Query Language", "Structured Question Language", "System Query Language"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 7,
+    question: "Which programming language is primarily used for Android development?",
+    options: ["Swift", "Kotlin/Java", "C#", "Python"],
+    answer: 1,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 8,
+    question: "What is the main purpose of Git?",
+    options: ["Version Control", "Web Development", "Database Management", "Game Development"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 9,
+    question: "What does RAM stand for?",
+    options: ["Random Access Memory", "Read Access Memory", "Rapid Access Memory", "Readily Available Memory"],
+    answer: 0,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 10,
+    question: "Which company created the Java programming language?",
+    options: ["Microsoft", "Apple", "Sun Microsystems", "IBM"],
+    answer: 2,
+    createdAt: new Date().toISOString()
+  }
+];
+
+// Initialize questions file if it doesn't exist
+if (!fs.existsSync(QUESTIONS_FILE)) {
+  fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(DEFAULT_QUESTIONS, null, 2));
+  console.log('✅ Created questions.json with 10 default Computer Science questions');
+} else {
+  console.log('📚 Loaded existing questions.json file');
+}
+
+// Load questions from file
+function loadQuestions() {
+  try {
+    const data = fs.readFileSync(QUESTIONS_FILE, 'utf8');
+    const questions = JSON.parse(data);
+    console.log(`📚 Loaded ${questions.length} questions from permanent storage`);
+    return questions;
+  } catch (error) {
+    console.error('Error loading questions:', error);
+    return DEFAULT_QUESTIONS;
+  }
+}
+
+// Save questions to file
+function saveQuestions(questions) {
+  try {
+    fs.writeFileSync(QUESTIONS_FILE, JSON.stringify(questions, null, 2));
+    console.log(`💾 Saved ${questions.length} questions to permanent storage`);
+    return true;
+  } catch (error) {
+    console.error('Error saving questions:', error);
+    return false;
+  }
+}
+
+// ============================================
+// API ENDPOINTS
+// ============================================
+
+// Admin login
 app.post('/api/admin/login', (req, res) => {
   const { username, password } = req.body;
   
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-    res.json({ 
-      success: true, 
-      message: 'Login successful', 
-      token: 'admin-token-' + Date.now() 
-    });
+    res.json({ success: true, message: 'Login successful', token: 'admin-token-' + Date.now() });
   } else {
-    res.status(401).json({ 
-      success: false, 
-      message: 'Invalid credentials' 
-    });
+    res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
 });
 
-// Get all questions
+// GET all questions
 app.get('/api/questions', (req, res) => {
-  try {
-    const questionsFilePath = path.join(__dirname, 'data', 'questions.json');
-    if (fs.existsSync(questionsFilePath)) {
-      const data = fs.readFileSync(questionsFilePath, 'utf8');
-      const questions = JSON.parse(data);
-      res.json({ success: true, questions: questions });
-    } else {
-      res.json({ success: true, questions: [] });
-    }
-  } catch (error) {
-    console.error('Error loading questions:', error);
-    res.status(500).json({ success: false, message: 'Failed to load questions' });
-  }
+  const questions = loadQuestions();
+  res.json({ success: true, questions: questions });
 });
 
-// Add new question (Permanent save)
+// POST - Add new question (PERMANENT SAVE)
 app.post('/api/questions', (req, res) => {
   try {
     const { question, options, answer } = req.body;
-    const questionsFilePath = path.join(__dirname, 'data', 'questions.json');
     
-    let questions = [];
-    if (fs.existsSync(questionsFilePath)) {
-      const data = fs.readFileSync(questionsFilePath, 'utf8');
-      questions = JSON.parse(data);
+    if (!question || !options || !Array.isArray(options) || options.length !== 4) {
+      return res.status(400).json({ success: false, message: 'Invalid question data' });
     }
     
+    const questions = loadQuestions();
     const newId = questions.length > 0 ? Math.max(...questions.map(q => q.id)) + 1 : 1;
+    
     const newQuestion = {
       id: newId,
       question: question,
@@ -89,109 +191,50 @@ app.post('/api/questions', (req, res) => {
     };
     
     questions.push(newQuestion);
-    fs.writeFileSync(questionsFilePath, JSON.stringify(questions, null, 2));
     
-    console.log(`📚 [PERMANENT] Question saved to disk: ID ${newId}`);
-    res.json({ success: true, message: 'Question saved permanently', question: newQuestion });
+    if (saveQuestions(questions)) {
+      console.log(`➕ Admin added question: ID ${newId} - "${question.substring(0, 50)}..."`);
+      res.json({ success: true, message: 'Question saved permanently!', question: newQuestion });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to save question' });
+    }
   } catch (error) {
     console.error('Error adding question:', error);
-    res.status(500).json({ success: false, message: 'Failed to add question' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// Delete question (Permanent)
+// DELETE question (PERMANENT REMOVAL)
 app.delete('/api/questions/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const questionsFilePath = path.join(__dirname, 'data', 'questions.json');
-    
-    let questions = [];
-    if (fs.existsSync(questionsFilePath)) {
-      const data = fs.readFileSync(questionsFilePath, 'utf8');
-      questions = JSON.parse(data);
-    }
-    
+    const questions = loadQuestions();
     const filteredQuestions = questions.filter(q => q.id !== id);
     
     if (filteredQuestions.length === questions.length) {
       return res.status(404).json({ success: false, message: 'Question not found' });
     }
     
-    fs.writeFileSync(questionsFilePath, JSON.stringify(filteredQuestions, null, 2));
-    console.log(`🗑️ [PERMANENT] Question deleted: ID ${id}`);
-    res.json({ success: true, message: 'Question deleted permanently' });
+    if (saveQuestions(filteredQuestions)) {
+      console.log(`🗑️ Admin deleted question: ID ${id}`);
+      res.json({ success: true, message: 'Question deleted permanently!' });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to delete question' });
+    }
   } catch (error) {
     console.error('Error deleting question:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete question' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// Ensure data directory exists
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
+// ============================================
+// GAME STATE MANAGEMENT
+// ============================================
 
-const questionsFilePath = path.join(dataDir, 'questions.json');
-
-// Initialize questions.json if it doesn't exist
-if (!fs.existsSync(questionsFilePath)) {
-  const defaultQuestions = [
-    {
-      id: 1,
-      question: "What does CPU stand for?",
-      options: ["Central Processing Unit", "Computer Personal Unit", "Central Program Utility", "Core Processing Utility"],
-      answer: 0,
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 2,
-      question: "Which data structure uses LIFO?",
-      options: ["Queue", "Array", "Stack", "Linked List"],
-      answer: 2,
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 3,
-      question: "What does HTTP stand for?",
-      options: ["HyperText Transfer Protocol", "High Transfer Text Protocol", "Hyper Transfer Text Protocol", "HyperText Transmission Program"],
-      answer: 0,
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 4,
-      question: "Which is a JavaScript framework?",
-      options: ["Django", "Flask", "React", "Laravel"],
-      answer: 2,
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 5,
-      question: "Time complexity of binary search?",
-      options: ["O(n)", "O(log n)", "O(n²)", "O(1)"],
-      answer: 1,
-      createdAt: new Date().toISOString()
-    }
-  ];
-  fs.writeFileSync(questionsFilePath, JSON.stringify(defaultQuestions, null, 2));
-  console.log('✅ Created questions.json with default questions');
-}
-
-function loadQuestions() {
-  try {
-    const data = fs.readFileSync(questionsFilePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error loading questions:', error);
-    return [];
-  }
-}
-
-// Game state storage
 const rooms = new Map();
 
 io.on('connection', (socket) => {
-  console.log(`New client connected: ${socket.id}`);
+  console.log(`👤 Client connected: ${socket.id}`);
 
   socket.on('joinRoom', (data) => {
     const { roomId, playerName } = data;
@@ -223,7 +266,7 @@ io.on('connection', (socket) => {
     }
 
     if (room.gameActive) {
-      socket.emit('errorMessage', 'Game already in progress. Please wait.');
+      socket.emit('errorMessage', 'Game already in progress');
       return;
     }
 
@@ -247,22 +290,14 @@ io.on('connection', (socket) => {
       questions: room.questions
     });
 
-    // PRIVATE - Only notify that someone joined, not who
-    socket.to(roomId).emit('playerJoined', {
-      playersCount: room.players.size
-    });
-
+    socket.to(roomId).emit('playerJoined', { playersCount: room.players.size });
     console.log(`${playerName} joined room ${roomId}`);
   });
 
   socket.on('startGame', (data) => {
     const { roomId } = data;
     
-    if (!rooms.has(roomId)) {
-      socket.emit('errorMessage', 'Room not found');
-      return;
-    }
-
+    if (!rooms.has(roomId)) return;
     const room = rooms.get(roomId);
     
     if (socket.id !== room.hostId) {
@@ -271,12 +306,7 @@ io.on('connection', (socket) => {
     }
 
     if (!room.questions || room.questions.length === 0) {
-      socket.emit('errorMessage', 'No questions available.');
-      return;
-    }
-
-    if (room.players.size < 1) {
-      socket.emit('errorMessage', 'Need at least one player');
+      socket.emit('errorMessage', 'No questions available');
       return;
     }
 
@@ -287,7 +317,6 @@ io.on('connection', (socket) => {
     
     for (let [playerId, player] of room.players.entries()) {
       player.score = 0;
-      room.scores.set(playerId, 0);
     }
 
     io.to(roomId).emit('gameStarted');
@@ -297,8 +326,6 @@ io.on('connection', (socket) => {
         sendQuestionWithTimer(roomId, room);
       }
     }, DELAY_START_GAME);
-
-    console.log(`Game started in room ${roomId}`);
   });
 
   function sendQuestionWithTimer(roomId, room) {
@@ -315,9 +342,7 @@ io.on('connection', (socket) => {
       timeLimit: room.timeRemaining
     });
     
-    if (room.timerInterval) {
-      clearInterval(room.timerInterval);
-    }
+    if (room.timerInterval) clearInterval(room.timerInterval);
     
     room.timerInterval = setInterval(() => {
       if (!room.gameActive) {
@@ -333,7 +358,7 @@ io.on('connection', (socket) => {
         room.timerInterval = null;
         
         io.to(roomId).emit('timeUp', { 
-          message: `Time's up! Moving to next question...`,
+          message: "Time's up! Moving to next question...",
           correctAnswer: room.questions[room.currentQuestionIndex].answer,
           correctAnswerText: room.questions[room.currentQuestionIndex].options[room.questions[room.currentQuestionIndex].answer]
         });
@@ -354,10 +379,7 @@ io.on('connection', (socket) => {
   
   function endGame(roomId, room) {
     room.gameActive = false;
-    if (room.timerInterval) {
-      clearInterval(room.timerInterval);
-      room.timerInterval = null;
-    }
+    if (room.timerInterval) clearInterval(room.timerInterval);
     
     const finalScores = Array.from(room.players.values()).map(p => ({
       name: p.name,
@@ -373,7 +395,6 @@ io.on('connection', (socket) => {
     
     if (!rooms.has(roomId)) return;
     const room = rooms.get(roomId);
-    
     if (!room.gameActive) return;
     
     const player = room.players.get(socket.id);
@@ -386,13 +407,11 @@ io.on('connection', (socket) => {
     
     if (isCorrect) {
       player.score += 1;
-      room.scores.set(socket.id, player.score);
       socket.emit('scoreUpdate', { score: player.score });
     }
     
     room.answeredPlayers.add(socket.id);
     
-    // PRIVATE FEEDBACK - Only the answering player sees result
     const currentQ = room.questions[room.currentQuestionIndex];
     if (isCorrect) {
       socket.emit('answerFeedback', { 
@@ -408,17 +427,13 @@ io.on('connection', (socket) => {
       });
     }
     
-    // PRIVATE - Only broadcast that someone answered, not who or if correct
     io.to(roomId).emit('someoneAnswered', {
       totalAnswered: room.answeredPlayers.size,
       totalPlayers: room.players.size
     });
     
     if (room.answeredPlayers.size === room.players.size) {
-      if (room.timerInterval) {
-        clearInterval(room.timerInterval);
-        room.timerInterval = null;
-      }
+      if (room.timerInterval) clearInterval(room.timerInterval);
       
       setTimeout(() => {
         if (room.gameActive) {
@@ -433,9 +448,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  // EXIT BUTTON HANDLER - User quitting during game
   socket.on('exitGame', (data) => {
-    const { roomId, playerName } = data;
+    const { roomId } = data;
     
     if (rooms.has(roomId)) {
       const room = rooms.get(roomId);
@@ -444,16 +458,11 @@ io.on('connection', (socket) => {
       if (player) {
         room.players.delete(socket.id);
         socket.leave(roomId);
-        
-        // Notify others that someone left (without name)
-        io.to(roomId).emit('playerLeft', {
-          playersCount: room.players.size
-        });
+        io.to(roomId).emit('playerLeft', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
           rooms.delete(roomId);
-          console.log(`Room ${roomId} deleted (all players left)`);
         } else if (socket.id === room.hostId && room.players.size > 0) {
           const newHostId = Array.from(room.players.keys())[0];
           room.hostId = newHostId;
@@ -462,7 +471,6 @@ io.on('connection', (socket) => {
         }
         
         socket.emit('exitConfirmed', { message: 'You have left the game' });
-        console.log(`${player.name} exited game`);
       }
     }
   });
@@ -477,10 +485,7 @@ io.on('connection', (socket) => {
       if (player) {
         room.players.delete(socket.id);
         socket.leave(roomId);
-        
-        io.to(roomId).emit('playerLeft', {
-          playersCount: room.players.size
-        });
+        io.to(roomId).emit('playerLeft', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
@@ -504,10 +509,7 @@ io.on('connection', (socket) => {
       if (room.players.has(socket.id)) {
         const player = room.players.get(socket.id);
         room.players.delete(socket.id);
-        
-        io.to(roomId).emit('playerLeft', {
-          playersCount: room.players.size
-        });
+        io.to(roomId).emit('playerLeft', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
@@ -524,17 +526,20 @@ io.on('connection', (socket) => {
   });
 });
 
-// Serve frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n🚀 CS Quiz Arena Server Running!`);
-  console.log(`📍 Local: http://localhost:${PORT}`);
+  console.log(`\n${'='.repeat(60)}`);
+  console.log(`🚀 CS Quiz Arena Server Running!`);
+  console.log(`${'='.repeat(60)}`);
+  console.log(`📍 URL: http://localhost:${PORT}`);
+  console.log(`💾 Permanent storage: ${QUESTIONS_FILE}`);
+  console.log(`📚 Default questions: 10 Computer Science questions`);
   console.log(`🔒 Privacy mode: ON (players cannot see each other's answers)`);
-  console.log(`💾 Permanent save: Questions saved to disk`);
   console.log(`🚪 Exit button: Available during gameplay`);
-  console.log(`\n🔐 Admin Login: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}\n`);
+  console.log(`\n🔐 Admin Login: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}`);
+  console.log(`${'='.repeat(60)}\n`);
 });

@@ -254,7 +254,7 @@ io.on('connection', (socket) => {
         hostId: null,
         scores: new Map(),
         timerInterval: null,
-        timeRemaining: 20
+        timeRemaining: 30
       });
     }
 
@@ -313,7 +313,7 @@ io.on('connection', (socket) => {
     room.gameActive = true;
     room.currentQuestionIndex = 0;
     room.answeredPlayers.clear();
-    room.timeRemaining = 20;
+    room.timeRemaining = 30;
     
     for (let [playerId, player] of room.players.entries()) {
       player.score = 0;
@@ -333,7 +333,7 @@ io.on('connection', (socket) => {
     
     const currentQuestion = room.questions[room.currentQuestionIndex];
     room.answeredPlayers.clear();
-    room.timeRemaining = 20;
+    room.timeRemaining = 30;
     
     io.to(roomId).emit('nextQuestion', {
       questionData: currentQuestion,

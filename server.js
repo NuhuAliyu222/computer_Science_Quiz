@@ -290,7 +290,8 @@ io.on('connection', (socket) => {
       questions: room.questions
     });
 
-    socket.to(roomId).emit('playerJoined', { playersCount: room.players.size });
+    // PRIVATE - Only notify that player count changed, not who joined
+    socket.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
     console.log(`${playerName} joined room ${roomId}`);
   });
 
@@ -412,6 +413,7 @@ io.on('connection', (socket) => {
     
     room.answeredPlayers.add(socket.id);
     
+    // PRIVATE FEEDBACK - Only the answering player sees result
     const currentQ = room.questions[room.currentQuestionIndex];
     if (isCorrect) {
       socket.emit('answerFeedback', { 
@@ -427,10 +429,8 @@ io.on('connection', (socket) => {
       });
     }
     
-    io.to(roomId).emit('someoneAnswered', {
-      totalAnswered: room.answeredPlayers.size,
-      totalPlayers: room.players.size
-    });
+    // NO BROADCASTING - Players cannot see each other's answers
+    // REMOVED: io.to(roomId).emit('someoneAnswered', ...)
     
     if (room.answeredPlayers.size === room.players.size) {
       if (room.timerInterval) clearInterval(room.timerInterval);
@@ -458,7 +458,9 @@ io.on('connection', (socket) => {
       if (player) {
         room.players.delete(socket.id);
         socket.leave(roomId);
-        io.to(roomId).emit('playerLeft', { playersCount: room.players.size });
+        
+        // PRIVATE - Only update player count, no names
+        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
@@ -485,7 +487,9 @@ io.on('connection', (socket) => {
       if (player) {
         room.players.delete(socket.id);
         socket.leave(roomId);
-        io.to(roomId).emit('playerLeft', { playersCount: room.players.size });
+        
+        // PRIVATE - Only update player count, no names
+        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
@@ -509,7 +513,9 @@ io.on('connection', (socket) => {
       if (room.players.has(socket.id)) {
         const player = room.players.get(socket.id);
         room.players.delete(socket.id);
-        io.to(roomId).emit('playerLeft', { playersCount: room.players.size });
+        
+        // PRIVATE - Only update player count, no names
+        io.to(roomId).emit('playerCountUpdate', { playersCount: room.players.size });
         
         if (room.players.size === 0) {
           if (room.timerInterval) clearInterval(room.timerInterval);
@@ -538,7 +544,7 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(`📍 URL: http://localhost:${PORT}`);
   console.log(`💾 Permanent storage: ${QUESTIONS_FILE}`);
   console.log(`📚 Default questions: 10 Computer Science questions`);
-  console.log(`🔒 Privacy mode: ON (players cannot see each other's answers)`);
+  console.log(`🔒 FULL PRIVACY MODE: Players CANNOT see each other's answers`);
   console.log(`🚪 Exit button: Available during gameplay`);
   console.log(`\n🔐 Admin Login: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}`);
   console.log(`${'='.repeat(60)}\n`);
